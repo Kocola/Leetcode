@@ -1,0 +1,78 @@
+1.时间：O（N^2）;空间：O（1） -> 超时
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        if(nums.size() < 3) return vector<vector<int>>{};
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> result;
+        auto last = nums.end();
+        for(auto a = nums.begin(); a < prev(last, 2); ++a){
+            auto b = next(a);
+            auto c = prev(last, 1);
+            while(b < c){
+                if(*a + *b + *c < 0){
+                    ++b;
+                }else if(*a + *b + *c > 0){
+                    --c;
+                }else{
+                    result.push_back(vector<int>{*a, *b, *c});
+                    ++b;
+                    --c;
+                }
+            }
+        }
+        sort(result.begin(), result.end());
+        result.erase(unique(result.begin(), result.end()), result.end());
+        return result;
+    }
+};
+2.时间：O（N^2）;空间：O（1）
+思路：（1）先对数组nums进行排序；
+（2）对数组中的每个元素的下标low，mid = low + 1， high = length - 1，sum = nums[low] + nums[mid] + nums[high];
+   sum == 0， 将三个元素组成vector，并插入到结果中，且low++, high--;
+   sum   <  0，low++；
+   sum   >  0，high--；
+在这个过程中，注意对重复元素的处理，避免产生重复元素
+   nums[low] == nums[low-1]
+   nums[mid] == nums[mid - 1]
+   nums[high] == nums[high - 1]
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        if(nums.size() < 3) return vector<vector<int>>{};
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> result;
+        for(int low = 0; low < nums.size() - 2; ++low){
+            int mid = low + 1;
+            int high = nums.size() - 1;
+            /*重复判断*/
+            if(low > 0 && nums[low] == nums[low-1]){
+                /*这里没有low++，因为low++的操作在for语句里面*/	
+                continue;
+            }
+            while(mid < high){
+                /*重复判断*/
+                if(mid > low + 1 && nums[mid] == nums[mid - 1]){
+                    mid++;
+                    continue;
+                    }
+                if(high < nums.size() - 1 && nums[high] == nums[high + 1]){
+                    high--;
+                    continue;
+                }
+                
+                int sum = nums[low] + nums[mid] + nums[high];
+                if(sum == 0){
+                    result.push_back({nums[low], nums[mid], nums[high]});
+                    mid++;
+                    high--;
+                }else if(sum > 0){
+                    high--;
+                }else{
+                    mid++;
+                }
+            }
+        }
+        return result;
+    }
+};

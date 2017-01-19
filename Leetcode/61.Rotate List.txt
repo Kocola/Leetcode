@@ -1,0 +1,32 @@
+1.时间：O（N）；空间：O（1） ->连接成环
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* rotateRight(ListNode* head, int k) {
+		/* 注意k可能>链表长度 */
+		if (head == nullptr || k == 0) return head;
+		/* 计算链表长度 */
+		int listLen = 1;
+		ListNode* p = head;
+		while (p->next != nullptr){
+			listLen++;
+			p = p->next;
+		}
+		int leftLen = listLen - k % listLen;
+		p->next = head;	//首尾相连
+		for (int i = 0; i < leftLen; ++i){
+			p = p->next;
+		}
+		head = p->next;
+		p->next = nullptr;
+
+		return head;
+	}
+};

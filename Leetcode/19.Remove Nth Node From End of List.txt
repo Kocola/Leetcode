@@ -1,0 +1,80 @@
+1.时间：O（N）；空间：O（1）    -> 数据为[1,2] 1时出错
+class Solution {
+public:
+	ListNode* removeNthFromEnd(ListNode* head, int n) {
+		if (head == nullptr || n <= 0) return head;
+		/* 计算链表长度 */
+		int listLen = 0;
+		ListNode* p = head;
+		while (p != nullptr){
+			listLen++;
+			p = p->next;
+		}
+		/* 获取待删除结点的index */
+		int index = listLen - n % listLen;
+		p = head;
+		if (index <= 0) return head;
+		/* 删除头结点 */
+		if (index == 1){
+			head = head->next;
+			delete p;
+			return head;
+		}
+		for (int i = 0; i < index - 1; ++i){
+			p = p->next;
+		}
+		ListNode* q = p->next;
+		if (p->next != nullptr){
+			p->next = p->next->next;
+			delete q;
+		}
+
+		return head;
+	}
+};
+2.时间：O（N）；空间：O（1）->必须添加头结点，不然，[1],1这样的数据会出错
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* removeNthFromEnd(ListNode* head, int n) {
+		if (head == nullptr || n <= 0) return head;
+		head = addHeadNode(head);
+		/* 让p先移动n步，再p,q一起移动，等到p->next为null时，删除q->next */
+		ListNode* p = head, *q = head;
+		for (int i = 0; i < n; ++i){
+			p = p->next;
+		}
+		while (p->next != nullptr){
+			p = p->next;
+			q = q->next;
+		}
+		p = q->next;
+		if (q->next != nullptr){
+			q->next = q->next->next;
+			delete p;
+		}
+		return removeNodeInHead(head);
+	}
+private:
+	/* 添加头结点 */
+	ListNode* addHeadNode(ListNode* l){
+		ListNode* p = new ListNode(-1);
+		p->next = l;
+		l = p;
+		return l;
+	}
+	/* 删除头结点 */
+	ListNode* removeNodeInHead(ListNode* l){
+		ListNode* p = l;
+		l = l->next;
+		delete p;
+		return l;
+	}
+};

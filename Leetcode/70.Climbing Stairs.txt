@@ -1,0 +1,22 @@
+1.时间：O（N）；空间：O（1）->迭代
+class Solution {
+public:
+    int climbStairs(int n) {
+	    int prev = 0, cur = 1;
+	    for (int i = 1; i <= n; ++i){
+	    	int temp = cur;
+		    cur = cur + prev;
+	    	prev = temp;
+	    }
+	    return cur;
+    }
+};
+
+2.时间：；空间：O（1）-> 斐波那契数列的通项公式为：b = (5)^(1/2);an = (1/b)[((1+b)/2)^n - ((1-b)/2)^n]
+class Solution {
+public:
+    int climbStairs(int n) {
+	    const double s = std::sqrt(5);
+	    return std::floor((std::pow((1+s)/2, n+1) - std::pow((1-s)/2, n+1)) / s + 0.5);
+    }
+};

@@ -1,0 +1,28 @@
+1.O(N),(遍历+找规律)，所花时间：15ms，超过72.18%：
+class Solution {
+public:
+	string convert(string s, int numRows) {
+		if (numRows == 1) return s;
+		std::string ret;
+		for (int i = 0; i < numRows; ++i){
+			int index = i, count = 0;
+			while (index < s.size()){
+				if (i == 0 || i == numRows - 1){
+					ret.push_back(s[index]);
+					index += 2 * numRows - 2;
+				}
+				else{
+					ret.push_back(s[index]);
+					if (count & 0x01){
+						index = index + 2 * i;
+					}
+					else{
+						index = index + 2 * numRows - 2 - 2 * i;
+					}
+					count = count + 1;
+				}
+			}
+		}
+		return ret;
+	}
+};

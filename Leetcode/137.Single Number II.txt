@@ -1,0 +1,22 @@
+1.时间：O（N）;空间：O（1）
+class Solution {
+public:
+	int singleNumber(vector<int>& nums) {
+		const int size = nums.size();
+		std::vector<int> bits(32, 0); 
+		/* 统计所有数字在各个二进制位上的1的个数 */
+		for (int i = 0; i < size; ++i){
+			for (int j = 0; j < 32; ++j){
+				bits[j] += ((nums[i] >> j) & 1);
+			}
+		}
+		int result = 0;
+		for (int i = 0; i < 32; ++i){
+			/* 如果该位上1的个数不是3的倍数，那么肯定这一位是出现一次的那个数的某一位 */ 
+			if (bits[i] % 3 != 0){
+				result |= 1 << i;
+			}
+		}
+		return result;
+	}
+};

@@ -1,0 +1,12 @@
+1.时间：O（N）；空间：O（1） -> 利用异或
+class Solution {
+public
+	int singleNumber(vectorint& nums) {
+		if (nums.size() == 1) return nums[0];
+		int result = 0;
+		for (int i = 0; i  nums.size(); ++i){
+			result = result ^ nums[i];
+		}
+		return result;
+	}
+};

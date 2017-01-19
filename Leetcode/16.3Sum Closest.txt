@@ -1,0 +1,25 @@
+1.Ê±¼ä£ºO£¨N^2£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+    int threeSumClosest(vector<int>& nums, int target) {
+        sort(nums.begin(), nums.end());
+        int minGap = (std::numeric_limits<int>::max)();
+        int result = 0;
+        for(int low = 0; low < nums.size() - 2; ++low){
+            auto mid = low + 1;
+            auto high = nums.size()-1;
+            while(mid < high){
+                auto sum = nums[low] + nums[mid] + nums[high];
+                auto curGap = std::abs(sum - target);
+                if(curGap < minGap){
+                    minGap = curGap;
+                    result = sum;
+                }
+                if(sum == target) break;
+                else if(sum < target) mid++;
+                else high--;
+            }
+        }
+        return result;
+    }
+};

@@ -1,0 +1,28 @@
+1.O(N^2)解法（遍历+搜索），所需时间632ms，超过23.42%：
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        for (int i = 0; i < nums.size(); ++i){
+		    int numOne = nums[i];
+		    auto index = std::find(nums.begin() + (i + 1), nums.end(), target - numOne);
+		    if (index != nums.end()) return vector<int>{i, index - nums.begin()};
+	    }
+	    return vector<int>{};
+    }
+};
+2.O(N)解法（hash（无序map）+遍历（有技巧，每次遍历的区间变成[0,i]，左闭右开）），所需时间13ms，超过82.15%：
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+	    std::unordered_map<int,int> hash;
+	    for (int i = 0; i < nums.size(); ++i){
+		    int numToFind = target - nums[i];
+	    	if (hash.find(numToFind) != hash.end()){
+			    return vector<int>{hash[numToFind], i};
+		    }
+	    	hash[nums[i]] = i;
+	    }
+	return vector<int>{};
+    }
+};
+总结：利用hash（自己写，unordered_set, unordered_map）加快搜索速度，题目要求将index作为返回，因此排序的办法行不通;

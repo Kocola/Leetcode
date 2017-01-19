@@ -1,0 +1,21 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+		if (gas.size() != cost.size()) return -1;
+		const int size = gas.size();
+		/* total记录整个gas-cost的和，如果其<0，那么肯定不存在
+			可行的方式，如果>=0，那么肯定存在，只需遍历一遍即可*/
+		int total = 0, sum = 0;	
+		int index = -1;
+		for (int i = 0; i < size; ++i){
+			total += gas[i] - cost[i];
+			sum += gas[i] - cost[i];
+			if (sum < 0){
+				index = i;
+				sum = 0;
+			}
+		}
+		return total >= 0 ? index + 1 : -1;
+	}
+};

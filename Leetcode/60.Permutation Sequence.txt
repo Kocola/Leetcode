@@ -1,0 +1,35 @@
+1.时间：O（N）;空间：O（1）
+class Solution {
+public:
+    string getPermutation(int n, int k) {
+        char baseCh = '0';
+        std::string str;
+        for(int i = 1; i <= n; ++i){
+            str.push_back(baseCh + i);
+        }
+        return kthPermutation(str, k);
+    }
+private:
+    int factorial(int n){
+        int result = 1;
+        for(int i = 2; i <= n; ++i){
+            result *= i;
+        }
+        return result;
+    }    
+    
+    template<typename T>
+    T kthPermutation(T seq, int k){
+        int n = seq.size();
+        int base = factorial(n-1);
+        T result;
+        k--;    /* 从0开始计数 */
+        for(int i = n - 1; i > 0; k = k % base, base = base / i, --i){
+            auto iterator = seq.begin() + (k / base);
+            result.push_back(*iterator);
+            seq.erase(iterator);
+        }
+        result.push_back(seq[0]);
+        return result;
+    }
+};

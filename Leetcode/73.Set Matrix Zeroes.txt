@@ -1,0 +1,47 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	void setZeroes(vector<vector<int>>& matrix) {
+		if (matrix.size() == 0 || matrix[0].size() == 0) return;
+		const int m = matrix.size(), n = matrix[0].size();
+		bool zero_row_haszeros = false, zero_col_haszeros = false;
+		/* 判断0列是否有0 */
+		for (int i = 0; i < m; ++i){
+			if (matrix[i][0] == 0){
+				zero_col_haszeros = true;
+				break;
+			}
+		}
+		/* 判断0行是否有0 */
+		for (int j = 0; j < n; ++j){
+			if (matrix[0][j] == 0){
+				zero_row_haszeros = true;
+				break;
+			}
+		}
+
+		for (int i = 1; i < m; ++i){
+			for (int j = 1; j < n; ++j){
+				if (matrix[i][j] == 0){
+					matrix[i][0] = matrix[0][j] = 0;
+				}
+			}
+		}
+		/* 根据matrix[i][0]或者matrix[0][j]是否为0，选择是否将matrix[i][j]置为0 */
+		for (int i = 1; i < m; ++i){
+			for (int j = 1; j < n; ++j){
+				if (matrix[i][0] == 0 || matrix[0][j] == 0){
+					matrix[i][j] = 0;
+				}
+			}
+		}
+		/* 如果先前记录第0行有0，那么第0行全置0 */
+		if (zero_row_haszeros){
+			for (int j = 0; j < n; ++j) matrix[0][j] = 0;
+		}
+		/* 如果先前记录第0列有0，那么第0列全置0 */
+		if (zero_col_haszeros){
+			for (int i = 0; i < m; ++i) matrix[i][0] = 0;
+		}
+	}
+};

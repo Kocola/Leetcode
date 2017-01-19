@@ -1,0 +1,36 @@
+1.时间：O（N^2）；空间：O（1）
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if(nums.size() == 0) return 0;/*如果没有这句，当nums为空时，运行结果出错，原因如下：
+	nums.size()返回的是一个无符号数，这里是0，无符号数0 - 1得到的是2^32-1，换成无符号数是
+	4294967295，index < 这个值成立，进入while循环，导致出错*/
+        int index = 0;
+        while(index < nums.size() - 1){
+            if(nums[index] == nums[index+1]){
+                for(int i = index + 1; i < nums.size() - 1; ++i){
+                    nums[i] = nums[i+1];
+                }
+                nums.resize(nums.size()-1);
+            }else{
+                index++;
+            }
+        }
+        return nums.size();
+    }
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if(nums.size() == 0) return 0;
+        int index = 0;
+        for(int i = 1; i < nums.size(); ++i){
+            if(nums[index] != nums[i]){
+                nums[++index] = nums[i];
+            }
+        }
+        nums.resize(index + 1);
+        return nums.size();
+    }
+};

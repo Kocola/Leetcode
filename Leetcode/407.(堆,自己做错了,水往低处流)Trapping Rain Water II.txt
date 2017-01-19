@@ -1,0 +1,112 @@
+1.时间：O（N*M）；空间：O（1）
+错误原因：未考虑到水往低处流的特性
+class Solution {
+public:
+    int trapRainWater(vector<vector<int>>& heightMap) {
+	    if (heightMap.size() == 0) return 0;
+	    int rows = heightMap.size(), cols = heightMap[0].size();
+	    std::vector<std::vector<int>> maxLeftHeight(rows, std::vector<int>(cols, 0));
+	    std::vector<std::vector<int>> maxRightHeight(rows, std::vector<int>(cols, 0));
+	    std::vector<std::vector<int>> maxUpHeight(rows, std::vector<int>(cols, 0));
+	    std::vector<std::vector<int>> maxDownHeight(rows, std::vector<int>(cols, 0));
+
+    	for (int i = 0; i < rows; ++i){
+		    for (int j = 1; j < cols; ++j){
+			    maxLeftHeight[i][j] = std::max(maxLeftHeight[i][j - 1], heightMap[i][j - 1]);
+		       	maxRightHeight[i][cols - j - 1] = std::max(maxRightHeight[i][cols - j], heightMap[i][cols - j]);
+		    }
+    	}
+
+    	for (int i = 0; i < cols; ++i){
+		    for (int j = 1; j < rows; ++j){
+		    	maxUpHeight[j][i] = std::max(maxUpHeight[j - 1][i], heightMap[j - 1][i]);
+		    	maxDownHeight[rows - j - 1][i] = std::max(maxDownHeight[rows - j][i], heightMap[rows - j][i]);
+		    }
+	    }
+
+	    /*for (int i = 0; i < rows; ++i){
+		    for (int j = 0; j < cols; ++j){
+		    	printf("heightMap[%d][%d] : %d, left=%d, right = %d, up = %d, down = %d\n", i, j, heightMap[i][j],     maxLeftHeight[i][j],
+			    	maxRightHeight[i][j], maxUpHeight[i][j], maxDownHeight[i][j]);
+	        }
+	    }*/
+
+	    int result = 0;
+	    for (int i = 0; i < rows; ++i){
+		    for (int j = 0; j < cols; ++j){
+			    int height = std::min(std::min(maxLeftHeight[i][j], maxRightHeight[i][j]), std::min(maxUpHeight[i][j], maxDownHeight[i][j]));
+			    if (heightMap[i][j] < height){
+			    	result += height - heightMap[i][j];
+			    }
+	   	    }
+	    }
+	    return result;
+     }
+};
+2.时间：O（M*N*LOG（M*N））；空间：O（M*N）
+思路：类似于42题，42题的基本思路是每次从两端的高度较小的一端移动，这样做的意义在于我们每次都是遍历
+最短的一个位置，也就是根据木桶原理这里可能漏水，还需要维护一个当前边界的最大值，这样如果某一个高度
+当前维护的边界最大值，那么这里可以保存一些水；
+二维的原理和一维的思路基本相同，在一维中，我们只需从两个端点选一个即可，而在二维中，可选的点就扩大
+成了整个矩形的边.根据上一题知道，我们同样每次应该先选取边界最小的高度，因此很自然地可以想到应该用优
+先队列来保存周围边界（小根堆）.在我们访问过了一个点之后要继续往矩形内部遍历，这样还需要保存一个点的
+位置.为了防止再次访问已经访问的点，还需要用一个数组标记每个点的访问状态；
+class Solution {
+public:
+    int trapRainWater(vector<vector<int>>& heightMap) {
+	    if(heightMap.size() == 0 || heightMap[0].size() == 0) return 0;
+	    
+	    int rows = heightMap.size(), cols = heightMap[0].size();
+	    std::vector<std::vector<int>> visited(rows, std::vector<int>(cols, 0));
+	    int dx[] = {-1, 1, 0, 0};
+	    int dy[] = {0, 0, -1, 1};
+	    
+	    std::priority_queue<Cell> q;
+	    /* 遍历矩形边界，并加入优先队列 */
+	    for(int i = 0; i < cols; ++i){
+	        visited[0][i] = 1;
+	        q.push(Cell(0, i, heightMap[0][i]));
+	        visited[rows - 1][i] = 1;
+	        q.push(Cell(rows - 1, i, heightMap[rows - 1][i]));
+	    }
+	    for(int i = 1; i < rows - 1; ++i){
+	        visited[i][0] = 1;
+	        q.push(Cell(i, 0, heightMap[i][0]));
+	        visited[i][cols - 1] = 1;
+	        q.push(Cell(i, cols - 1, heightMap[i][cols - 1]));
+	    }
+	    int result = 0, maxHeight = 0;
+	    while(!q.empty()){
+	        Cell cell = q.top();
+	        q.pop();
+	        
+	        int x = cell.x, y = cell.y, height = cell.height;
+	        
+	        for(int i = 0; i < 4; ++i){
+	           int nextX = x + dx[i], nextY = y + dy[i];
+	           if(nextX >= 0 && nextX <= rows - 1 && nextY >= 0 && nextY <= cols - 1 && visited[nextX][nextY] == 0){
+	               visited[nextX][nextY] = 1;
+	               /* 注意，插入小根堆的点的高度值，必须是该点的原始值和遍历开始后，已经出队的点里的高度最大值，
+		这里是取当前点和出队列的点的高度的最大值 */
+	               /* 这里的作用是维护一个周围边界的最小值 */	
+	               q.push(Cell(nextX, nextY, std::max(height, heightMap[nextX][nextY])));
+	               result += std::max(0, height - heightMap[nextX][nextY]);
+	           }
+	        }
+	    }
+	    return result;
+     }
+private:
+    struct Cell{
+        int x, y;
+        int height;
+        Cell(int x, int y, int height) : x(x), y(y), height(height){}
+        bool operator<(const Cell& rhs) const {
+            return this->height > rhs.height;/* 重载<运算符时，小根堆是 > */
+        }
+    };   
+
+    bool operator<(const Cell& lhs, const Cell& rhs){
+            return lhs.height > rhs.height;
+    }
+};

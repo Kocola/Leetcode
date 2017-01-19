@@ -1,0 +1,56 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        int swapPos = -1;
+        for(int i = nums.size() - 1; i > 0; --i){
+            if(nums[i] > nums[i-1]){		/* 这里不可以是>=，不然[5,1,1]->[1,1,5]这个例子出错 */
+                swapPos = i - 1;
+                break;
+            }
+        }
+        if(swapPos == -1){
+            std::reverse(nums.begin(), nums.end());
+            return;
+        }
+        
+        for(int i = nums.size() - 1; i > swapPos; --i){
+            if(nums[i] > nums[swapPos]){	/*这里同样不可以是>=，不然[2,3,2,1]->[3,1,2,2]这个例子会出错*/
+                std::swap(nums[i], nums[swapPos]);
+                break;
+            }
+        }
+        std::reverse(nums.begin() + swapPos + 1, nums.end());	/*注意该行位置，理解原理后就不会写错了*/
+    }
+};
+2.时间：O（N）；空间：O（1） -> STL的使用，导致运行速度相比于1较慢
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        nextPermutation(nums.begin(), nums.end());
+    }
+private:
+    template<typename T>
+    bool nextPermutation(T first, T last){
+        const auto rFirst = reverse_iterator<T>(last);
+        const auto rLast = reverse_iterator<T>(first);
+        
+        auto pivot = std::next(rFirst);
+        
+        while(pivot != rLast && *pivot >= *std::prev(pivot)){
+            ++pivot;
+        }
+        
+        if(pivot == rLast){
+            std::reverse(rFirst, rLast);
+            return false;
+        }
+        
+        auto change = std::find_if(rFirst, rLast, std::bind1st(std::less<int>(), *pivot));
+        
+        std::swap(*change, *pivot);
+        std::reverse(rFirst, pivot);
+        
+        return true;
+    }
+};

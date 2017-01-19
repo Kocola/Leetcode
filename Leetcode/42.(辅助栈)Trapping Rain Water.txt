@@ -1,0 +1,98 @@
+1.时间：O（N）；空间：O（1）
+思路：计算每个位置的左右最大高度，然后取较小的值，如果这个值大于该位置的高度，
+那么就将差值+到结果中
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        if(height.size() == 0) return 0;
+        std::vector<int> leftMax(height.size(), 0);/* index左的最大高度 */
+        std::vector<int> rightMax(height.size(), 0);/* index右的最大高度 */
+        /* 计算index的左右最大高度 */
+        for(int i = 1; i < height.size(); ++i){
+            leftMax[i] = std::max(leftMax[i - 1], height[i - 1]);
+            rightMax[height.size() - 1 - i] = std::max(rightMax[height.size() - i], height[height.size() - i]);
+        }
+        int result = 0;
+        /* 计算结果 */
+        for(int i = 0; i < height.size(); ++i){
+            int neighMinHeight = std::min(leftMax[i], rightMax[i]);
+            if(height[i] < neighMinHeight){
+                result += neighMinHeight - height[i];
+            }
+        }
+        return result;
+    }
+};
+2.时间：O（N）；空间：O（1）
+思路：预处理找到最大高度所在的位置，以此为界限，分别计算左右的所求值，
+预处理确保一个界限；
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        /* 获取最大高度所在的位置pos */
+        int maxHeightPos = 0;
+        for(int i = 1; i < height.size(); ++i){
+            if(height[i] > height[maxHeightPos]) maxHeightPos = i;
+        }
+        int result = 0;
+        /* 计算pos左边的结果值 */
+        for(int i = 0, peak = 0; i < maxHeightPos; ++i){
+            if(peak < height[i]) peak = height[i];
+            else result += peak - height[i];
+        }
+        /* 计算pos右边的结果值 */
+        for(int i = height.size() - 1, peak = 0; i > maxHeightPos; --i){
+            if(peak < height[i]) peak = height[i];
+            else result += peak - height[i];
+        }
+        return result;
+    }
+};
+3.时间：O（N）；空间：O（N）
+思路：用一个辅助栈，小于栈顶的元素压入，大于或者等于栈顶就把栈里所有小于或者等于
+当前值的元素全部出栈处理掉，计算面积
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        std::stack<std::pair<int, int>> s;/*height, pos*/
+        int result = 0;
+        for(int i = 0; i < height.size(); ++i){
+            int rightBoundHeight = height[i], midHeight = 0;
+            while(!s.empty()){
+                int leftBoundHeight = s.top().first;
+                int leftBoundPos = s.top().second;
+                /* i - 1 - leftBoundPos在第一次循环时必定是0，因此此时midHeight为多少并无关系 */
+                /* leftBoundHeight, midHeight, rightBoundHeight三者夹成的凹陷 */
+                /* 下面在leftBoundHeight < rightBoundHeight非成立时，需结束循环，不然下行的结果将有可能是负数，而导致错误 */
+                result += (std::min(leftBoundHeight, rightBoundHeight) - midHeight) * (i - 1 - leftBoundPos);
+                midHeight = leftBoundHeight;
+                
+                if(leftBoundHeight > rightBoundHeight) break;
+                else s.pop();
+            }
+            s.push(std::pair<int, int>(height[i], i));
+        }
+        return result;
+    }
+};
+4.时间：O（N）；空间：O（1）-> 相比1,2算法较慢
+思路：two point指向左右两端，维护一个当前左右同时能达到的最大高度，并让面积小的一端先移动，
+如果遇到一个新的高度小于当前最高高度，那么其高度差就可以存储一些水.如果碰到一个高度，使得
+左右能同时达到的高度增加，则更新
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        if(height.size() == 0) return 0;
+        int left = 0, right = height.size() - 1, minBoundValue = 0, result = 0;
+        while(left <= right){
+            int curValue = std::min(height[left], height[right]);
+            if(curValue < minBoundValue){
+                result += minBoundValue - curValue;
+            }else{
+                minBoundValue = curValue;
+            }
+            height[left] < height[right] ? left++ : right--;
+        }
+        return result;
+    }
+};

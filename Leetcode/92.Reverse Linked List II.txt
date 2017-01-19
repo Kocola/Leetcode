@@ -1,0 +1,91 @@
+1.时间：O（N）；空间：O（1） ->自己写的，比较繁琐，p->next->next使用前未考虑p->next为nullptr的情况
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* reverseBetween(ListNode* head, int m, int n) {
+		if (head == nullptr) return nullptr;
+		/* 添加头结点 */
+		ListNode* p = new ListNode(-1);
+		p->next = head;
+		head = p;
+
+		int reverseCount = n - m;
+		/* 获取待反转开始位置的前驱结点 */
+		while (m > 1){
+			p = p->next;
+			m--;
+		}
+		ListNode* q = p->next;
+		while (reverseCount-- > 0){
+			insertInNext(p, removeNext(q));
+		}
+		/* 删除头结点 */
+		p = head;
+		head = head->next;
+		delete p;
+
+		return head;
+	}
+private:
+	/* 移除当前结点的下一个结点 */
+	ListNode* removeNext(ListNode* p){
+		if (p == nullptr) return nullptr;
+		ListNode* q = p->next;
+		//p->next = p->next->next;//这里因未对p->next判断是否为null，有可能访问null指针
+		p->next = p->next != nullptr ? p->next->next : nullptr;
+		return q;
+	}
+	/* 将待插入结点插入当前结点的下一个位置 */
+	void insertInNext(ListNode* cur, ListNode* p){
+		if (p == nullptr) return;
+		p->next = cur->next;
+		cur->next = p;
+	}
+};
+2.时间：O（N）;空间：O（1） -> 相对简洁
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* reverseBetween(ListNode* head, int m, int n) {
+		if (head == nullptr) return head;
+		/* 添加头结点 */
+		ListNode* prev = new ListNode(-1);
+		prev->next = head;
+		head = prev;
+		
+		for (int i = 0; i < m - 1; ++i){
+			prev = prev->next;
+		}
+		ListNode* const head2 = prev;
+		prev = head2->next;
+		ListNode* cur = prev->next;
+
+		for (int i = m; i < n; ++i){
+			prev->next = cur->next;
+			cur->next = head2->next;
+			head2->next = cur;
+			cur = prev->next;
+		}
+
+		/* 删除头结点 */
+		ListNode* p = head;
+		head = head->next;
+		delete p;
+
+		return head;
+	}
+};

@@ -1,0 +1,14 @@
+1.时间：O（N）；空间：O（1）
+std::vector<int> plusOne(std::vector<int>& digits) {
+	if (digits.size() == 0) return std::vector<int>();
+	int sum = 0, carry = 1;	//初始化进位为1，表示+1
+	for (int i = digits.size() - 1; i >= 0; --i){
+		sum = digits[i] + carry;
+		carry = sum / 10;
+		digits[i] = sum % 10;
+	}
+	if (carry > 0){
+		digits.insert(digits.begin(), carry);
+	}
+	return digits;
+}

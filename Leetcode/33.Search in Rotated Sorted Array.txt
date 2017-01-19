@@ -1,0 +1,40 @@
+1.时间：O（LOGN）；空间：O（1）
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int low = 0, high = nums.size() - 1;
+        while(low <= high){
+            int mid = low + ((high - low) >> 1);/* >>优先级小于+，所以要加括号 */
+            if(nums[mid] == target) return mid;
+            else if(nums[low] <= nums[mid]){ /* [low, mid]有序，=不可少，不然例如[3, 1]这样的数据会出错 */
+                if(target >= nums[low] && target < nums[mid]) high = mid - 1; 		/* 因为[low, mid]有序，所以判断target是否在在区间[low, mid)上（因为tartget != nums[mid]，所以左闭右开） */
+                else low = mid + 1;
+            }else{   /* [mid, high]有序 */
+                if(target > nums[mid] && target <= nums[high]) low = mid + 1;		/* 因为[mid, high]有序，所以判断target是否在在区间(mid，high]上（因为tartget != nums[mid]，所以左开右闭） */
+                else high = mid - 1;
+            }
+        }
+        return -1;   
+    }
+};
+等价：
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int low = 0, high = nums.size() - 1;
+        while(low <= high){
+            int mid = low + ((high - low) >> 1);/* >>优先级小于+，所以要加括号 */
+            if(nums[mid] == target) return mid;
+            else if(nums[low] <= nums[mid]){ /* [low, mid]有序，=不可少，不然例如[3, 1]这样的数据会出错 */
+                if(target >= nums[low] && target < nums[mid]) high = mid - 1; 		/* 因为[low, mid]有序，所以判断target是否在在区间[low, mid)上（因为tartget != nums[mid]，所以左闭右开） */
+                else low = mid + 1;
+            }else if(nums[low] > nums[mid]){   /* [mid, high]有序 */ /*这行不用else而是改成当前，那么上一个else if里就不需要有=了*/
+                if(target > nums[mid] && target <= nums[high]) low = mid + 1;		/* 因为[mid, high]有序，所以判断target是否在在区间(mid，high]上（因为tartget != nums[mid]，所以左开右闭） */
+                else high = mid - 1;
+            }else{	/*上一行改动后，这里必须加else，不然有可能死循环，例子：[3,1]*/
+                low++;
+            }
+        }
+        return -1;   
+    }
+};

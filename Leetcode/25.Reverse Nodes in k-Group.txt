@@ -1,0 +1,138 @@
+1.时间：O（N）；空间：O（1） -> 自己写的，代码看起来比较混乱
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* reverseKGroup(ListNode* head, int k) {
+		if (head == nullptr || k == 1) return head;
+		head = insertNodeInHead(head);	//添加头结点
+		ListNode* prev = head;
+		while (1){
+			ListNode* p = prev->next;
+			ListNode* q = moveK(prev, k);
+			if (q == nullptr) break;
+			/* 将[p,q]区间的结点进行翻转 */
+			ListNode* cur = p->next;
+			//p->next = q->next;
+			for (int i = 0; i < k - 1; ++i){
+				ListNode* next = cur->next;
+				cur->next = prev->next;
+				prev->next = cur;
+				cur = next;
+			}
+			p->next = cur;
+			prev = p;
+		}
+		return removeNodeInHead(head);
+	}
+private:
+	/* 获取当前结点移动K步后的结点 */
+	ListNode* moveK(ListNode* l, int k){
+		if (l == nullptr) return l;
+		/* 获取长度为k的链表 */
+		int listLen = 0;
+		ListNode* p = l;
+		while (p != nullptr && listLen < k){
+			listLen++;
+			p = p->next;
+		}
+		return p;
+	}
+	/* 添加头结点 */
+	ListNode* insertNodeInHead(ListNode* l){
+		ListNode* p = new ListNode(-1);
+		p->next = l;
+		l = p;
+		return l;
+	}
+	/* 删除头结点 */
+	ListNode* removeNodeInHead(ListNode* l){
+		ListNode* p = l;
+		l = l->next;
+		delete p;
+		return l;
+	}
+};
+2.时间：O（N）；空间：O（1）  ->拆分函数，迭代
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* reverseKGroup(ListNode* head, int k) {
+		if (head == nullptr || k <= 1) return head;
+		head = addNodeInHead(head);	//添加头结点
+		for (ListNode* prev = head, *end = head->next; end != nullptr; end = prev->next){
+			for (int i = 1; i < k && end != nullptr; ++i){		//end开始处在Group头，故需移动k-1次
+				end = end->next;
+			}
+			if (end == nullptr) break;
+			prev = reverse(prev, prev->next, end);
+		}
+		return removeNodeInHead(head);
+	}
+private:
+	/* 返回翻转后的Group的尾结点，作为下一个Group的prev */
+	ListNode* reverse(ListNode* prev, ListNode* begin, ListNode* end){
+		ListNode* end_next = end->next;
+		ListNode* cur = begin->next;
+		while (cur != end_next){
+			ListNode* cur_next = cur->next;
+			cur->next = prev->next;
+			prev->next = cur;
+			cur = cur_next;
+		}
+		begin->next = end_next;
+		return begin;		/* 翻转后Group的头结点变为该Group的尾结点 */
+	}
+	/* 添加头结点 */
+	ListNode* addNodeInHead(ListNode* l){
+		ListNode* p = new ListNode(-1);
+		p->next = l;
+		l = p;
+		return l;
+	}
+	/* 删除头结点 */
+	ListNode* removeNodeInHead(ListNode* l){
+		ListNode* p = l;
+		l = l->next;
+		delete p;
+		return l;
+	}
+};
+3.时间：O（N）；空间：O（N） ->递归，不用头结点
+class Solution {
+public:
+	ListNode* reverseKGroup(ListNode* head, int k) {
+		if (head == nullptr || head->next == nullptr || k <= 1) return head;
+		ListNode* next_group = head;
+		for (int i = 0; i < k; ++i){
+			if (next_group){
+				next_group = next_group->next;
+			}
+			else{
+				return head;
+			}
+		}
+		ListNode* new_next_group = reverseKGroup(next_group, k);
+		ListNode* prev = nullptr, *cur = head;
+		while (cur != next_group){
+			ListNode* cur_next = cur->next;
+			cur->next = prev != nullptr ? prev : new_next_group;
+			prev = cur;
+			cur = cur_next;
+		}
+		return prev;
+	}
+};

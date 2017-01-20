@@ -1,0 +1,32 @@
+1.时间：O（N）；空间：O（N）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	vector<vector<int>> levelOrderBottom(TreeNode* root) {
+		if (root == nullptr) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		traversal(root, 1, result);
+		std::reverse(result.begin(), result.end());
+		return result; 
+	}
+private:
+	void traversal(TreeNode* root, size_t level, std::vector<std::vector<int>>& result){
+		if (root == nullptr) return;
+		if (level > result.size()){
+			result.push_back(std::vector<int>());
+		}
+		result[level - 1].push_back(root->val);
+		traversal(root->left, level + 1, result);
+		traversal(root->right, level + 1, result);
+	}
+};
+2.时间：O（N）；空间：O（1）	->迭代
+详见102；

@@ -1,0 +1,23 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨N£©
+class Solution {
+public:
+	bool isValid(string s) {
+		std::string left_brackets = "([{";
+		std::string right_brackets = ")]}";
+		std::stack<char> stk;
+		for (int i = 0; i < s.size(); ++i){
+			if (left_brackets.find(s[i]) != std::string::npos){
+				stk.push(s[i]);
+			}
+			else{
+				if (stk.empty() || stk.top() != left_brackets[right_brackets.find(s[i])]){
+					return false;
+				}
+				else{
+					stk.pop();
+				}
+			}
+		}
+		return stk.empty();
+	}
+};

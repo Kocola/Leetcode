@@ -1,0 +1,50 @@
+1.时间：O（1）；空间：O（N）
+class LRUCache {
+	struct CacheNode{
+		int key;
+		int value;
+		CacheNode(int key, int value) : key(key), value(value){}
+	};
+public:
+	LRUCache(int capacity) {
+		this->capacity = capacity;
+	}
+
+	int get(int key) {
+		if (cacheMap.find(key) == cacheMap.end()) return -1;
+		cacheList.splice(cacheList.begin(), cacheList, cacheMap[key]);
+		cacheMap[key] = cacheList.begin();
+		return cacheMap[key]->value;
+	}
+
+	void put(int key, int value) {
+		if (cacheMap.find(key) == cacheMap.end()){
+			if (cacheList.size() == capacity){  //删除链表尾部节点（访问最少的点）
+				cacheMap.erase(cacheList.back().key);
+				cacheList.pop_back();
+			}
+			//插入新节点在链表头部，并在map中增加该节点
+			cacheList.push_front(CacheNode(key, value));
+			cacheMap[key] = cacheList.begin();
+		}
+		else{
+		    //更新节点的值，把当前访问的节点移到链表头部，并且更新map中该节点的值
+		    cacheMap[key]->value = value;
+			cacheList.splice(cacheList.begin(), cacheList, cacheMap[key]);
+			cacheMap[key] = cacheList.begin();
+		}
+	}
+private:
+	int capacity;
+	std::list<CacheNode> cacheList;
+	std::unordered_map<int, std::list<CacheNode>::iterator> cacheMap;
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
+* obj.put(key,value);
+*/

@@ -1,0 +1,72 @@
+1.时间：O（N）；空间：O（1）	-> 思路不清晰，考虑不周全
+class Solution {
+public:
+	int evalRPN(vector<string>& tokens) {
+		std::stack<int> stk;
+		for (int i = 0; i < tokens.size(); ++i){
+			if ((tokens[i][0] >= '0' && tokens[i][0] <= '9') || (tokens[i].size() > 1 && ((tokens[i][0] == '-') || (tokens[i][0] == '+')))){
+				stk.push(simpleAtoi(tokens[i]));
+			}
+			else{
+				int result = 0;
+				int numOne = stk.top();
+				stk.pop();
+				int numTwo = stk.top();
+				stk.pop();
+				switch (tokens[i][0]){
+				case '+': result = numOne + numTwo; break;
+				case '-': result = numTwo - numOne; break;
+				case '*':result = numOne * numTwo; break;
+				case '/': result = numTwo / numOne; break;
+				}
+				stk.push(result);
+			}
+		}
+		return stk.top();
+	}
+private:
+	int simpleAtoi(const std::string& str){
+		int result = 0, index = 0;
+		bool isNegtive = false;
+		if (str[0] == '-'){
+			index++;
+			isNegtive = true;
+		}
+		else if (str[0] == '+'){
+			index++;
+		}
+		for (; index < str.size(); ++index){
+			result = result * 10 + str[index] - '0';
+		}
+		return result * (isNegtive ? -1 : 1);
+	}
+};
+2.时间：O（N）；空间：O（N）	->思路清晰，
+class Solution {
+public:
+	int evalRPN(vector<string>& tokens) {
+		std::stack<int> stk;
+		for (int i = 0; i < tokens.size(); ++i){
+			if (is_operator(tokens[i])){
+				int numOne = 0, numTwo = 0;
+				numOne = stk.top(), stk.pop();
+				numTwo = stk.top(), stk.pop();
+				switch (tokens[i][0]){
+				case '+':numTwo += numOne; break;
+				case '-':numTwo -= numOne; break;
+				case '*':numTwo *= numOne; break;
+				case  '/':numTwo /= numOne; break;
+				}
+				stk.push(numTwo);
+			}
+			else{
+				stk.push(atoi(tokens[i].c_str()));
+			}
+		}
+		return stk.top();
+	}
+private:
+	bool is_operator(const std::string& str){
+		return str.size() == 1 && std::string("+-*/").find(str[0]) != std::string::npos;
+	}
+};

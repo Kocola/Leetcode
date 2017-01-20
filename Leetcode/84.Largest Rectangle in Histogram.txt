@@ -1,0 +1,19 @@
+1.时间：O（N）；空间：O（N） -> 栈维护递增序列
+class Solution {
+public:
+	int largestRectangleArea(vector<int>& heights) {
+		std::stack<int> stk;
+		heights.push_back(0);
+		int result = 0;
+		for (int i = 0; i < heights.size();){
+			if (stk.empty() || heights[i] > heights[stk.top()]){
+				stk.push(i++);
+			}else{
+				int tmp = stk.top();
+				stk.pop();
+				result = std::max(result, heights[tmp] * (stk.empty() ? i : (i - stk.top() - 1)));
+			}
+		}
+		return result;
+	}
+};

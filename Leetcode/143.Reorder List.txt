@@ -1,0 +1,47 @@
+1.时间：O（N）；空间：O（1）
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void reorderList(ListNode* head) {
+		if (head == nullptr || head->next == nullptr) return ;//下面的代码仅适用>=2的结点数，这里需判断是否无结点或仅有一个结点
+		/* 将链表切为前后两段 */
+		ListNode* slow = head, *fast = head, *prev = nullptr
+		while (fast != nullptr && fast->next != nullptr){
+			prev = slow;
+			slow = slow->next;
+			fast = fast->next->next;
+		}
+		prev->next = nullptr;	//断开前后两段
+		slow = reverse(slow);
+		ListNode* cur = head;
+		while (cur->next != nullptr){
+			ListNode* tmp = slow->next;
+			slow->next = cur->next;
+			cur->next = slow;
+			slow = tmp;
+			cur = cur->next->next;
+		}
+		cur->next = slow;
+	}
+private:
+	ListNode* reverse(ListNode* head){
+	    if(head == nullptr || head->next == nullptr) return head;	//cur=head->next，后面cur解引用，因此需要判断head->next是否为空，这个又需判断head是否为空
+		ListNode* cur = head->next, *prev = head;
+		head->next = nullptr;
+		while (cur->next != nullptr){
+			ListNode* cur_next = cur->next;
+			cur->next = prev;
+			prev = cur;
+			cur = cur_next;
+		}
+		cur->next = prev;
+		return cur;
+	}
+};

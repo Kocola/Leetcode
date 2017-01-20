@@ -1,0 +1,84 @@
+1.时间：O（N）；空间：O（N） -> 利用栈
+class Solution {
+public:
+	int longestValidParentheses(string s) {
+		std::stack<int> stk;
+		int max_len = 0, last = -1;//last是当前有效区间开始的上个位置的下标
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] == '('){
+				stk.push(s[i]);
+			}
+			else{
+				if (stk.empty()) last = i;
+				else{
+					stk.pop();
+					if (stk.empty()){
+						//(last, i]区间内都是合法的
+						max_len = std::max(max_len, i - last);
+					}
+					else{
+						//说明(stk.top(), i]的区间内是合法的
+						max_len = std::max(max_len, i - stk.top());
+					}
+				}
+			}
+		}
+		return max_len;
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	int longestValidParentheses(string s) {
+		std::vector<int> len(s.size(), 0);
+		int max_len = 0;
+		for (int i = s.size() - 2; i >= 0; --i){
+			int match = i + len[i + 1] + 1;	//matxh：i匹配的字符下标
+			if (match < s.size() && s[i] == '(' && s[match] == ')'){
+				len[i] = len[i + 1] + 2;
+				if (match + 1 < s.size()){//例子：((...))()
+					len[i] += len[match + 1];
+				}
+				max_len = std::max(max_len, len[i]);
+			}
+		}
+		return max_len;
+	}
+};
+3.时间：O（N）；空间：O（1） ->两遍扫描
+class Solution {
+public:
+	int longestValidParentheses(string s) {
+		int depth = 0, last = -1, max_len = 0;
+		/* 从左往右扫描 */
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] == '('){
+				depth++;
+			}else{
+				depth--;
+				if (depth < 0){
+					last = i;
+					depth = 0;
+				}else if(depth == 0){
+					max_len = std::max(max_len, i - last);
+				}
+			}
+		}
+		/* 从右往左扫描 */
+		depth = 0, last = s.size();
+		for (int i = s.size() - 1; i >= 0; --i){
+			if (s[i] == ')'){
+				depth++;
+			}else{
+				depth--;
+				if (depth < 0){
+					last = i;
+					depth = 0;
+				}else if(depth == 0) {
+					max_len = std::max(max_len, last - i);
+				}
+			}
+		}
+		return max_len;
+	}
+};

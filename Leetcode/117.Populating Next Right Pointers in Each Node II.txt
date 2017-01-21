@@ -1,0 +1,98 @@
+1.时间：O（N）；空间O（N）	-> 层遍历思路，需要额外空间
+/**
+ * Definition for binary tree with next pointer.
+ * struct TreeLinkNode {
+ *  int val;
+ *  TreeLinkNode *left, *right, *next;
+ *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void connect(TreeLinkNode *root) {
+		if (root == nullptr) return;
+		std::queue<TreeLinkNode*> queue;
+		queue.push(root);
+		TreeLinkNode* curLevelLastNode = root;
+		TreeLinkNode* nextLevelLastNode = nullptr;
+		while (!queue.empty()){
+			auto cur = queue.front();
+			queue.pop();
+			if (cur->left != nullptr){
+				queue.push(cur->left);
+				nextLevelLastNode = cur->left;
+			}
+			if (cur->right != nullptr){
+				queue.push(cur->right);
+				nextLevelLastNode = cur->right;
+			}
+			if (cur == curLevelLastNode){
+				cur->next = nullptr;
+				curLevelLastNode = nextLevelLastNode;
+			}else{
+			    if(!queue.empty()) cur->next = queue.front();
+			    else cur->next = nullptr;
+			}
+		}
+	}
+};
+2.时间：O（N）；空间：O（1）	->递归
+/**
+ * Definition for binary tree with next pointer.
+ * struct TreeLinkNode {
+ *  int val;
+ *  TreeLinkNode *left, *right, *next;
+ *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void connect(TreeLinkNode *root) {
+		if (root == nullptr) return;
+		TreeLinkNode headNode(-1);
+		for (TreeLinkNode* cur = root, *prev = &headNode; cur != nullptr; cur = cur->next){
+			if (root->left != nullptr){
+				prev->next = cur->left;
+				prev = cur->left;
+			}
+			if (root->right != nullptr){
+				prev->next = cur->right;
+				prev = cur->right;
+			}
+		}
+		connect(headNode.next);
+	}
+};
+3.时间：O（N）；空间：O（1）	-> 迭代
+/**
+ * Definition for binary tree with next pointer.
+ * struct TreeLinkNode {
+ *  int val;
+ *  TreeLinkNode *left, *right, *next;
+ *  TreeLinkNode(int x) : val(x), left(NULL), right(NULL), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void connect(TreeLinkNode *root) {
+		if (root == nullptr) return;
+		auto curNode = root;
+		while (curNode != nullptr){
+			TreeLinkNode* nextLevelNode = nullptr;
+			TreeLinkNode* prev = nullptr;
+			for (; curNode != nullptr; curNode = curNode->next){
+				if (nextLevelNode == nullptr) nextLevelNode = curNode->left != nullptr ?
+					curNode->left : curNode->right;
+				if (curNode->left != nullptr){
+					if (prev != nullptr) prev->next = curNode->left;
+					prev = curNode->left;
+				}
+				if (curNode->right != nullptr){
+					if (prev != nullptr) prev->next = curNode->right;
+					prev = curNode->right;
+				}
+			}
+			curNode = nextLevelNode;
+		}
+	}
+};

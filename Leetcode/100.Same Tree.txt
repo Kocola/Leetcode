@@ -1,0 +1,86 @@
+1.时间：O（N）；空间：O（1）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool isSameTree(TreeNode* p, TreeNode* q) {
+		if (p == nullptr && q == nullptr) return true;
+		if (p == nullptr || q == nullptr) return false;
+		if ((p->val == q->val) && isSameTree(p->left, q->left) && isSameTree(p->right, q->right)){
+			return true;
+		}
+		return false;
+	}
+};
+2.时间：O（N）；空间：O（N）	->迭代 两个栈
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool isSameTree(TreeNode* p, TreeNode* q) {
+		std::stack<TreeNode*>pStk;
+		std::stack<TreeNode*>qStk;
+		pStk.push(p);
+		qStk.push(q);
+		while (!pStk.empty() && !qStk.empty()){
+			auto curP = pStk.top();
+			pStk.pop();
+			auto curQ = qStk.top();
+			qStk.pop();
+			if (curP == nullptr && curQ == nullptr) continue;
+			if (curP == nullptr || curQ == nullptr) return false;
+			if (curP->val != curQ->val) return false;
+			pStk.push(curP->left);
+			pStk.push(curP->right);
+			qStk.push(curQ->left);
+			qStk.push(curQ->right);
+		}
+		return pStk.empty() && qStk.empty();
+	}
+};
+3.时间：O（N）；空间：O（N）	->迭代 一个栈
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool isSameTree(TreeNode* p, TreeNode* q) {
+		std::stack<TreeNode*>stk;
+		stk.push(p);
+		stk.push(q);
+		while (!stk.empty()){
+			auto curP = stk.top();
+			stk.pop();
+			auto curQ = stk.top();
+			stk.pop();
+			if (curP == nullptr && curQ == nullptr) continue;
+			if (curP == nullptr || curQ == nullptr) return false;
+			if (curP->val != curQ->val) return false;
+			stk.push(curP->left);
+			stk.push(curQ->left);
+			stk.push(curP->right);
+			stk.push(curQ->right);
+		}
+		return true;
+	}
+};

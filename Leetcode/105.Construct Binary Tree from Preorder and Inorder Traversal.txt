@@ -1,0 +1,57 @@
+1.时间：O（N）；空间：O（LOGN）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+		if (preorder.size() != inorder.size()) return nullptr;
+		if (preorder.size() == 0) return nullptr;
+		return buildTree(&preorder[0], &inorder[0], preorder.size());
+	}
+private:
+	TreeNode* buildTree(int* pre, int* in, int len){
+		if (len <= 0) return nullptr;
+		if (len == 1) return new TreeNode(*pre);
+		auto inRoot = std::find(in, in + len, *pre);
+		int leftLen = inRoot - in;
+		auto root = new TreeNode(*pre);
+		root->left = buildTree(pre + 1, in, leftLen);
+		root->right = buildTree(pre + leftLen + 1, inRoot + 1, len - leftLen - 1);
+		return root;
+	}
+};
+2.时间：O（N）；空间：O（LOGN）	->因为用迭代器，比较慢
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+		return buildTree(preorder.begin(), preorder.end(), inorder.begin(), inorder.end());
+ 	}
+private:
+	template<typename Iterator>
+	TreeNode* buildTree(Iterator preFirst, Iterator preLast, Iterator inFirst, Iterator inLast){
+		if (preFirst == preLast || inFirst == inLast) return nullptr;
+		auto root = new TreeNode(*preFirst);
+		auto inRootPos = std::find(inFirst, inLast, *preFirst);
+		//auto leftLen = std::distance(inFirst, inRootPos);
+		auto leftLen = inRootPos - inFirst;
+		root->left = buildTree(std::next(preFirst), std::next(preFirst, leftLen + 1), inFirst, std::next(inFirst, leftLen));
+		root->right = buildTree(std::next(preFirst, leftLen + 1), preLast, std::next(inFirst, leftLen + 1), inLast);
+		return root;
+	}
+};

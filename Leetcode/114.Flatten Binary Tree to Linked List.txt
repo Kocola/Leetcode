@@ -1,0 +1,79 @@
+1.时间：O（N）；空间：O（LOGN）		->迭代
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void flatten(TreeNode* root) {
+		if (root == nullptr) return;
+		std::stack<TreeNode*> stk;
+		stk.push(root);
+		while (!stk.empty()){
+			auto p = stk.top();
+			stk.pop();
+			if (p->right != nullptr) stk.push(p->right);
+			if (p->left != nullptr) stk.push(p->left);
+			p->left = nullptr;
+			if (!stk.empty()) p->right = stk.top();
+		}
+	}
+};
+2.时间：O（N）；空间：O（LOGN）		->迭代+递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void flatten(TreeNode* root) {
+		if (root == nullptr) return;	//终止条件
+
+		flatten(root->left);
+		flatten(root->right);
+
+		/* 如果当前root是左孩子为空，那么直接返回 */
+		if (root->left == nullptr) return;
+
+		/* 当前root的左右孩子都已flatten，将左孩子的链表连在root和右孩子之间*/
+		auto p = root->left;
+		while (p->right != nullptr) p = p->right;
+		p->right = root->right;
+		root->right = root->left;
+		root->left = nullptr;
+	}
+};
+3.时间：O（N）；空间：O（LOGN）	->递归（比较难理解）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	void flatten(TreeNode* root) {
+		if (root == nullptr) return;	
+		flatten(root, nullptr);
+	}
+private:
+	TreeNode* flatten(TreeNode* root, TreeNode* tail){
+		if (root == nullptr) return tail;
+		root->right = flatten(root->left, flatten(root->right, tail));
+		root->left = nullptr;
+		return root;
+	}
+};

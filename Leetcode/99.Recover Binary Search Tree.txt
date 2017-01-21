@@ -1,0 +1,57 @@
+1.时间：O（N）；空间：O（N）
+
+  Definition for a binary tree node.
+  struct TreeNode {
+      int val;
+      TreeNode left;
+      TreeNode right;
+      TreeNode(int x)  val(x), left(NULL), right(NULL) {}
+  };
+ 
+class Solution {
+public
+	 空间：O（N）的做法，中序遍历，两遍扫描，取逆序数 
+	void recoverTree(TreeNode root) {
+		if (root == nullptr) return;
+		stdvectorTreeNode nodes = inorderTravel(root);
+		 两个逆序的结点下标 
+		int leftMistakeNodeIndex = -1, rightMistakeNodeIndex = -1;
+		 从左-右扫描 
+		for (int i = 1; i  nodes.size(); ++i){
+			if (nodes[i - 1]-val  nodes[i]-val){
+				leftMistakeNodeIndex = i - 1;
+				break;
+			}
+		}
+		 从右-左扫描 
+		for (int i = nodes.size() - 2; i = 0; --i){
+			if (nodes[i]-val  nodes[i + 1]-val){
+				rightMistakeNodeIndex = i + 1;
+				break;
+			}
+		}
+		 交换两个结点的值 
+		stdswap(nodes[leftMistakeNodeIndex]-val, nodes[rightMistakeNodeIndex]-val);
+	}
+private
+	 中序遍历，返回所有结点的vector 
+	stdvectorTreeNode inorderTravel(TreeNode root){
+		if (root == nullptr) return stdvectorTreeNode();
+		stdvectorTreeNode result;
+		stdstackTreeNode stk;
+		TreeNode cur = root;
+		while (!stk.empty()  cur != nullptr){
+			if (cur != nullptr){
+				stk.push(cur);
+				cur = cur-left;
+			}
+			else{
+				cur = stk.top();
+				stk.pop();
+				result.push_back(cur);
+				cur = cur-right;
+			}
+		}
+		return result;
+	}
+};

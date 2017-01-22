@@ -1,0 +1,26 @@
+1.时间：O（N）；空间：O（N）（不一定是平衡的）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool isValidBST(TreeNode* root) {
+		if (root == nullptr) return true;
+		return isValidBST(root, std::numeric_limits<long long>::min(), std::numeric_limits<long long>::max());
+	}
+private:
+	/* 使用long long的目的是，结点值可能是INT_MIN和INT_MAX，而且这里不允许相同值存在，在这种情形下，用int会出错 */
+	bool isValidBST(TreeNode* root, long long lower, long long upper){
+		if (root == nullptr) return true;
+		
+		return (root->val > lower && root->val < upper) &&
+			isValidBST(root->left, lower, root->val) &&
+			isValidBST(root->right, root->val, upper);
+	}
+};

@@ -1,0 +1,114 @@
+1.时间：O（N）；空间：O（N）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	vector<vector<int>> pathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return std::vector<std::vector<int>>();
+		std::vector<int> curPath;
+		std::vector<std::vector<int>> result;
+		pathSum(root, sum, curPath, result);
+		return result;
+	}
+private:
+	void pathSum(TreeNode* root, int sum, std::vector<int>& curPath, std::vector<std::vector<int>>& result){
+		if (root->left == nullptr && root->right == nullptr){
+			if (sum == root->val){
+				curPath.push_back(root->val);
+				result.push_back(curPath);
+				curPath.pop_back();	//pop，防止该次递归影响后续递归
+			}
+			return;
+		}
+		if (root->left != nullptr){
+			curPath.push_back(root->val);
+			pathSum(root->left, sum - root->val, curPath, result);
+			curPath.pop_back();	//pop，防止该次递归影响后续递归
+		}
+		if (root->right != nullptr){
+			curPath.push_back(root->val);
+			pathSum(root->right, sum - root->val, curPath, result);
+			curPath.pop_back();	//pop，防止该次递归影响后续递归
+		}
+	}
+};
+2.时间：O（N）；空间：O（N）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	vector<vector<int>> pathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return std::vector<std::vector<int>>();
+		std::vector<int> curPath;
+		std::vector<std::vector<int>> result;
+		pathSum(root, sum, curPath, result);
+		return result;
+	}
+private:
+	void pathSum(TreeNode* root, int sum, std::vector<int>& curPath, std::vector<std::vector<int>>& result){
+		if (root == nullptr) return;
+		curPath.push_back(root->val);
+		if (root->left == nullptr && root->right == nullptr){
+			if (root->val == sum){
+				result.push_back(curPath);
+			}
+			//这里不能return，不然就不能将当前push_back的值pop_back，从而导致错误
+		}
+		pathSum(root->left, sum - root->val, curPath, result);
+		pathSum(root->right, sum - root->val, curPath, result);
+		curPath.pop_back();	//pop，防止该次递归影响后续递归
+	}
+};
+3.2.时间：O（N）；空间：O（N）	->迭代
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	vector<vector<int>> pathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::stack<std::pair<TreeNode*, std::vector<int>>> stk;
+		stk.push(std::pair<TreeNode*, std::vector<int>>(root, std::vector<int>()));
+		while (!stk.empty()){
+			auto node = stk.top().first;
+			auto path = stk.top().second;
+			stk.pop();
+			path.push_back(node->val);
+			if (node->left == nullptr && node->right == nullptr){
+				if (sum == std::accumulate(path.begin(), path.end(), 0)){
+					result.push_back(path);
+				}
+				continue;
+			}
+			if (node->left != nullptr){
+				stk.push(std::pair<TreeNode*, std::vector<int>>(node->left, path));
+			}
+			if (node->right != nullptr){
+				stk.push(std::pair<TreeNode*, std::vector<int>>(node->right, path));
+			}
+		}
+		std::reverse(result.begin(), result.end());
+		return result;
+	}
+};

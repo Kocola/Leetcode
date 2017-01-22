@@ -1,0 +1,54 @@
+1.时间：O（N）；空间：O（N）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	int maxPathSum(TreeNode* root) {
+		if (root == nullptr) return 0;
+		int maxSum = std::numeric_limits<int>::min();
+		dfs(root, maxSum);
+		return maxSum;
+	}
+private:
+	int dfs(TreeNode* root, int& maxSum){
+		if (root == nullptr) return 0;
+		int leftMaxSum = dfs(root->left, maxSum);
+		int rightMaxSum = dfs(root->right, maxSum);
+		int sum = root->val;
+		if (leftMaxSum > 0) sum += leftMaxSum;	//>0表示对后续结果有利，故加上
+		if (rightMaxSum > 0) sum += rightMaxSum;
+		maxSum = std::max(maxSum, sum);
+		//写成root->val + std::max(leftMaxSum, rightMaxSum) > 0 ? std::max(leftMaxSum, rightMaxSum) : 0;错误
+		return std::max(leftMaxSum, rightMaxSum) > 0 ? std::max(leftMaxSum, rightMaxSum) + root->val : root->val;		//至少要包含当前root结点
+	}
+};
+2.时间：O（N）；空间：O（N）		->错误（存在很多问题）
+class Solution {
+public:
+	int maxPathSum(TreeNode* root) {
+		if (root == nullptr) return 0;
+		int pathValue = 0, totalValue = 0;
+		maxPathSum(root, pathValue, totalValue);
+		return std::max(pathValue, totalValue);
+	}
+private:
+	void maxPathSum(TreeNode* root, int& pathValue, int& totalValue){
+		if (root->left == nullptr && root->right == nullptr){
+			pathValue = totalValue = root->val;
+			return;
+		}
+		int leftPathValue = 0, leftTotalValue = std::numeric_limits<int>::min();
+		int rightPathValue = 0, rightTotalValue = std::numeric_limits<int>::min();
+		if (root->left != nullptr) maxPathSum(root->left, leftPathValue, leftTotalValue);
+		if (root->right != nullptr) maxPathSum(root->right, rightPathValue, rightTotalValue);
+		pathValue = std::max(leftPathValue, rightPathValue) + root->val;
+		totalValue = std::max(std::max(leftTotalValue, rightTotalValue), leftPathValue + rightPathValue + root->val);
+	}
+};

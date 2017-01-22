@@ -1,0 +1,61 @@
+1.时间：O（N）；空间：O（LOGN）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	TreeNode* sortedArrayToBST(vector<int>& nums) {
+		if (nums.size() == 0) return nullptr;
+		/* &nums[0]需确保nums.size() > 0 */
+ 		return sortedArrayToBST(&nums[0], 0, nums.size());
+	}
+private:
+	TreeNode* sortedArrayToBST(const int* array, int start, int end){
+		if (start >= end){
+			return nullptr;
+		}
+		int mid = start + ((end - start) >> 1);
+		auto root = new TreeNode(array[mid]);
+		root->left = sortedArrayToBST(array, start, mid);
+		root->right = sortedArrayToBST(array, mid + 1, end);
+		return root;
+	}
+};
+2.同上
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	TreeNode* sortedArrayToBST(vector<int>& nums) {
+		if (nums.size() == 0) return nullptr;
+		/* &nums[0]需确保nums.size() > 0 */
+ 		return sortedArrayToBST(&nums[0], 0, nums.size());
+	}
+private:
+	TreeNode* sortedArrayToBST(const int* array, int start, int end){
+		if (start >= end){	//结束条件
+			return nullptr;
+		}
+		if (start + 1 == end){	    //减少函数调用，极大提升了运行效率	
+			return new TreeNode(array[start]);
+		}
+		int mid = start + ((end - start) >> 1);
+		auto root = new TreeNode(array[mid]);
+		root->left = sortedArrayToBST(array, start, mid);
+		root->right = sortedArrayToBST(array, mid + 1, end);
+		return root;
+	}
+};

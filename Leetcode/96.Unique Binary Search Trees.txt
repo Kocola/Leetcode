@@ -1,0 +1,15 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨N£©
+class Solution {
+public:
+	int numTrees(int n) {
+		std::vector<int> kinds(n + 1, 0);
+		kinds[0] = 1;
+		kinds[1] = 1;
+		for (int i = 2; i <= n; ++i){
+			for (int k = 1; k <= i; ++k){
+				kinds[i] += kinds[k - 1] * kinds[i - k];
+			}
+		}
+		return kinds[n];
+	}
+};

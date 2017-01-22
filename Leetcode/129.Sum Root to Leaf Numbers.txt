@@ -1,0 +1,66 @@
+1.时间：O（N）；空间：O（N）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	int sumNumbers(TreeNode* root) {
+		if (root == nullptr) return 0;
+		return sumNumbers(root, 0);
+	}
+private:
+	int sumNumbers(TreeNode* root, int lastNumber){
+		if (root->left == nullptr && root->right == nullptr){
+			return lastNumber * 10 + root->val;
+		}
+		int sum = 0;
+		if (root->left != nullptr){
+			sum += sumNumbers(root->left, lastNumber * 10 + root->val);
+		}
+		if (root->right != nullptr){
+			sum += sumNumbers(root->right, lastNumber * 10 + root->val);
+		}
+		return sum;
+	}
+};
+2.1.时间：O（N）；空间：O（N）	->迭代
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	int sumNumbers(TreeNode* root) {
+		if (root == nullptr) return 0;
+		std::stack<std::pair<TreeNode*, int>> stk;
+		stk.push(std::pair<TreeNode*, int>(root, 0));
+		int result = 0;
+		while (!stk.empty()){
+			auto node = stk.top().first;
+			int lastNum = stk.top().second;
+			stk.pop();
+			if (node->left == nullptr && node->right == nullptr){
+				result += lastNum * 10 + node->val;
+				continue;
+			}
+			if (node->left != nullptr){
+				stk.push(std::pair<TreeNode*, int>(node->left, lastNum * 10 + node->val));
+			}
+			if (node->right != nullptr){
+				stk.push(std::pair<TreeNode*, int>(node->right, lastNum * 10 + node->val));
+			}
+		}
+		return result;
+	}
+};

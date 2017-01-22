@@ -1,0 +1,79 @@
+1.时间：O（N）；空间：O（LOGN）	-> 递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	int minDepth(TreeNode* root) {
+		if (root == nullptr) return 0;
+		int leftDepth = minDepth(root->left);
+		int rightDepth = minDepth(root->right);
+		if (root->left == nullptr || root->right == nullptr){
+			return root->left != nullptr ? leftDepth + 1 : rightDepth + 1;
+		}
+		return std::min(leftDepth, rightDepth) + 1;
+	}
+};
+2.时间：O（N）；空间：O（LOGN）	-> 递归（较1慢）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	int minDepth(TreeNode* root) {
+		if (root == nullptr) return 0;
+		return minDepth(root, false);
+	}
+private:
+	int minDepth(TreeNode* root, bool hasbrother){
+		if (root == nullptr) return hasbrother ? std::numeric_limits<int>::max() : 0;
+		return std::min(minDepth(root->left, root->right != nullptr),
+			minDepth(root->right, root->left != nullptr)) + 1;
+	}
+};
+3.时间：O（N）；空间：O（LOGN）		->迭代
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	int minDepth(TreeNode* root) {
+		if (root == nullptr) return 0;
+		std::stack<std::pair<TreeNode*,int>> stk;
+		stk.push(std::pair<TreeNode*, int>(root, 1));
+		int result = std::numeric_limits<int>::max();
+		while (!stk.empty()){
+			auto curNode = stk.top().first;
+			int depth = stk.top().second;
+			stk.pop();
+			if (curNode->left == nullptr && curNode->right == nullptr){
+				result = std::min(result, depth);
+			}
+			if (curNode->left != nullptr && result > depth){	//result > depth剪枝
+				stk.push(std::pair<TreeNode*, int>(curNode->left, depth + 1));
+			}
+			if (curNode->right != nullptr && result > depth){
+				stk.push(std::pair<TreeNode*, int>(curNode->right, depth + 1));
+			}
+		}
+		return result;
+	}
+};

@@ -1,0 +1,34 @@
+1.Ê±¼ä£ºO£¨N^2£©;¿Õ¼ä£ºO£¨1£©
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* insertionSortList(ListNode* head) {
+		if (head == nullptr) return head;
+		ListNode newHead(std::numeric_limits<int>::min());
+		//headNode.next = head;
+		for (auto curNode = head; curNode != nullptr;){
+			auto prev = findInsertPos(&newHead, curNode->val);
+			auto curNext = curNode->next;
+			curNode->next = prev->next;
+			prev->next = curNode;
+			curNode = curNext;
+		}
+		return newHead.next;
+	}
+private:
+	ListNode* findInsertPos(ListNode* head, int value){
+		if (head == nullptr) return nullptr;
+		if (value == std::numeric_limits<int>::min()) return head;
+		ListNode* prev = nullptr;
+		for (ListNode* curNode = head; curNode != nullptr && curNode->val < value;
+			prev = curNode, curNode = curNode->next);
+		return prev;
+	}
+};

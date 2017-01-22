@@ -1,0 +1,110 @@
+1.时间：O（N）;空间：O（N）	->递归（不用localSum变量）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool hasPathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return false;
+		if (root->left == nullptr && root->right == nullptr){
+			return root->val == sum;
+		}
+		return hasPathSum(root->left, sum - root->val) ||
+			hasPathSum(root->right, sum - root->val);
+	}
+};
+2.时间：O（N）;空间：O（N）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool hasPathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return false;
+		return hasPathSum(root, 0, false, sum);
+	}
+private:
+	//hasbrother变量是防止非叶子节点时localSum == sum返回true的错误情况，示例[1,2], 1
+	bool hasPathSum(TreeNode* root, int localSum, bool hasbrother, int sum){
+		if (root == nullptr) return !hasbrother && localSum == sum;
+		if (hasPathSum(root->left, localSum + root->val, root->right != nullptr, sum) ||
+			hasPathSum(root->right, localSum + root->val, root->left != nullptr, sum)){
+			return true;
+		}
+		return false;
+	}
+};
+3.时间：O（N）;空间：O（N）	->递归
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool hasPathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return false;
+		return hasPathSum(root, 0, sum);
+	}
+private:
+	bool hasPathSum(TreeNode* root, int localSum, int sum){
+		if (root->left == nullptr && root->right == nullptr) return (localSum + root->val) == sum;
+		bool leftHasPath = false, rightHasPath = false;
+		if (root->left != nullptr){
+			leftHasPath = hasPathSum(root->left, localSum + root->val, sum);
+		}
+		if (root->right != nullptr){
+			rightHasPath = hasPathSum(root->right, localSum + root->val, sum);
+		}
+		return leftHasPath || rightHasPath;
+	}
+};
+4.时间：O（N）；空间：O（N）	->迭代
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	bool hasPathSum(TreeNode* root, int sum) {
+		if (root == nullptr) return false;
+		std::stack<std::pair<TreeNode*, int>> stk;
+		stk.push(std::pair<TreeNode*, int>(root, 0));
+		while (!stk.empty()){
+			auto node = stk.top().first;
+			int lastSum = stk.top().second;
+			stk.pop();
+			if (node->left == nullptr && node->right == nullptr){
+				if ((lastSum + node->val) == sum) return true;	//不可return (lastSum + node->val) == sum;
+			}
+			if (node->left != nullptr){
+				stk.push(std::pair<TreeNode*, int>(node->left, lastSum + node->val));
+			}
+			if (node->right != nullptr){
+				stk.push(std::pair<TreeNode*, int>(node->right, lastSum + node->val));
+			}
+		}
+		return false;
+	}
+};

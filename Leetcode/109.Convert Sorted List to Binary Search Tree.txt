@@ -1,0 +1,53 @@
+1.时间：O（N）；空间：O（LOGN）	-> 自底向顶
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	TreeNode* sortedListToBST(ListNode* head) {
+		if (head == nullptr) return nullptr;
+		auto listLen = calcLen(head);
+		return sortedListToBST(head, 0, listLen);
+	}
+private:
+	/* 计算链表长度 */
+	int calcLen(ListNode* head){
+		auto curNode = head;
+		int len = 0;
+		while (curNode != nullptr){
+			len++;
+			curNode = curNode->next;
+		}
+		return len;
+	}
+	/* 自底向顶 */
+	TreeNode* sortedListToBST(ListNode* &list, int start, int end){
+		if (start == end) return nullptr;
+		//if (start == end) return (new TreeNode(list->val));//不能有这行,list = list->next不会执行,导致结果出错
+
+		int mid = start + ((end - start) >> 1);
+
+		auto leftTree = sortedListToBST(list, start, mid);
+		auto root = new TreeNode(list->val);
+		list = list->next;
+		auto rightTree = sortedListToBST(list, mid + 1, end);
+		root->left = leftTree;
+		root->right = rightTree;
+
+		return root;
+	}
+};

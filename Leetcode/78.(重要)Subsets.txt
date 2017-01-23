@@ -1,0 +1,73 @@
+1.时间：O（2^N）；空间：O（N）	->递归
+class Solution {
+public:
+	vector<vector<int>> subsets(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		std::sort(nums.begin(), nums.end(), [](int a, int b){
+			return a < b;
+		});
+		subsets(nums, path, 0, result);
+		return result;
+	}
+private:
+	void subsets(const std::vector<int>& S, std::vector<int>& path, int step, std::vector<std::vector<int>>& result){
+		if (step == S.size()){
+			result.push_back(path);
+			return;
+		}
+		/* 不选S[step] */
+		subsets(S, path, step + 1, result);
+		/* 选择S[step] */
+		path.push_back(S[step]);
+		subsets(S, path, step + 1, result);
+		//将当前S[step]pop_back，避免影响后续递归
+		path.pop_back();
+	}
+};
+2.时间：O（2^N）；空间：O（N）	->递归
+class Solution {
+public:
+	vector<vector<int>> subsets(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<bool> selected(nums.size(), false);
+		subsets(nums, selected, 0, result);
+		return result;
+	}
+private:
+	void subsets(const std::vector<int>& S, std::vector<bool>& selected, int step, std::vector<std::vector<int>>& result){
+		if (step == S.size()){
+			std::vector<int> path;
+			for (int i = 0; i < selected.size(); ++i){
+				if (selected[i] == true) path.push_back(S[i]);
+			}
+			result.push_back(path);
+			return;
+		}
+		selected[step] = false;
+		subsets(S, selected, step + 1, result);
+		selected[step] = true;
+		subsets(S, selected, step + 1, result);
+		selected[step] = false;
+	}
+};
+3.时间：O（2^N）；空间：O（N）	->迭代
+class Solution {
+public:
+	/* 本方法的前提是nums.size()不大于int位数32 */
+	vector<vector<int>> subsets(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		const int size = nums.size();
+		for (int i = 0; i < 1 << size; ++i){
+			std::vector<int> path;
+			for (int k = 0; k < size; ++k){
+				if (i & (1 << k)) path.push_back(nums[k]);
+			}
+			result.push_back(path);
+		}
+		return result;
+	}
+};

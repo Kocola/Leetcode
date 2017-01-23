@@ -1,0 +1,91 @@
+1.时间：O（）；空间：O（1）	->深度优先搜索超时
+class Solution {
+public:
+	int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+		if (beginWord.size() != endWord.size()) return 0;
+		std::vector<int> visited(wordList.size(), 0);
+		int minLen = std::numeric_limits<int>::max();
+		transform(wordList, beginWord, endWord, visited, 1, minLen);
+		return minLen == std::numeric_limits<int>::max() ? 0 : minLen;
+	}
+private:
+	void transform(std::vector<std::string>& wordList, const std::string& curStr,
+		const std::string& target, std::vector<int>& visited, int step, int& minLen){
+		if (curStr == target){
+			minLen = std::min(minLen, step);
+			return;
+		}
+		//if(step >= minLen) return;  //剪枝
+		for (int i = 0; i < wordList.size(); ++i){
+			if (visited[i] == 0 && step < minLen && canTransform(curStr, wordList[i])){
+				visited[i] = 1;
+				transform(wordList, wordList[i], target, visited, step + 1, minLen);
+				visited[i] = 0;
+			}
+		}
+	}
+	/* wordList里所有字符串的长度相等 */
+	bool canTransform(const std::string& src, const std::string& dst){
+		const int size = src.size();
+		int diffCount = 0;
+		for (int i = 0; i < size; ++i){
+			if (src[i] != dst[i]){
+				if (diffCount > 0) return false;
+				diffCount++;
+			}
+		}
+		return true;
+	}
+};
+2.时间：O（N）；空间：O（N）	->广度优先搜索
+class Solution {
+public:
+	int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+		if (beginWord.size() != endWord.size()) return 0;
+		for_each(wordList.begin(), wordList.end(), [&](const std::string& str){
+			dict.insert(str);
+		});
+		std::queue<std::string> curLevel, nextLevel;
+		
+		bool found = false;
+		int level = 0;
+
+		curLevel.push(beginWord);
+		while (!curLevel.empty() && !found){
+			++level;
+			while (!curLevel.empty() && !found){
+				const std::string curStr = curLevel.front();
+				curLevel.pop();
+				const auto& newStates = stringExtend(curStr);
+				for (auto state : newStates){
+					nextLevel.push(state);
+					if (state == endWord){
+						found = true;
+						break;
+					}
+				}
+			}
+			std::swap(curLevel, nextLevel);	//curLevel此时已空
+		}
+		return found ? level + 1 : 0;
+	}
+private:
+	std::vector<std::string> stringExtend(std::string str){
+		std::vector<std::string> result;
+		for (int i = 0; i < str.size(); ++i){
+			for (char ch = 'a'; ch <= 'z'; ++ch){
+				if (ch == str[i]) continue;
+				std::swap(ch, str[i]);
+				if (dict.count(str) > 0 && visited.count(str) == 0){
+					result.push_back(str);
+					visited.insert(str);
+				}
+				std::swap(ch, str[i]);
+			}
+		}
+		return result;
+	}
+private:
+	std::unordered_set<std::string> dict;
+	std::unordered_set<std::string> visited;//判重
+};

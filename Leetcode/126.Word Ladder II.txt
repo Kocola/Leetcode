@@ -1,0 +1,68 @@
+1.时间：O（N）；空间：O（N）	->广度优先搜索
+class Solution {
+public:
+	vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+		/* 将wordList里的string放进dict，去重 */
+		for_each(wordList.begin(), wordList.end(), [&](const std::string& str){
+			dict.insert(str);
+		});
+		std::unordered_set<std::string> curLevel, nextLevel;
+		bool found = false;
+		curLevel.insert(beginWord);
+		while (!curLevel.empty() && !found){
+			/* 先将本层全部置为已访问，防止同层之间互相指向 */
+			for (auto str : curLevel){
+				visited.insert(str);
+			}
+			for (auto str : curLevel){
+				const auto& new_states = stringExtend(str);
+				for (auto state : new_states){
+					if (state == endWord) found = true;
+					nextLevel.insert(state);
+					father[state].push_back(str);
+				}
+			}
+			std::swap(curLevel, nextLevel);
+			nextLevel.clear();
+		}
+		std::vector<std::vector<std::string>> result;
+		if (found){
+			std::vector<std::string> path;
+			calcpath(beginWord, path, endWord, result);
+		}
+		return result;
+	}
+private:
+	std::vector<std::string> stringExtend(std::string str){
+		std::vector<std::string> result;
+		for (int i = 0; i < str.size(); ++i){
+			for (char ch = 'a'; ch <= 'z'; ++ch){
+				if (str[i] == ch) continue;
+				std::swap(str[i], ch);
+				if (dict.count(str) > 0 && !visited.count(str)){
+					result.push_back(str);
+					//visited.insert(str);	//这里加上这行会造成仅有一个结果
+				}
+				std::swap(str[i], ch);
+			}
+		}
+		return result;
+	}
+	void calcpath(const std::string& start, std::vector<std::string>& path,
+		const std::string& word, std::vector<std::vector<std::string>>& result){
+		path.push_back(word);
+		if (word == start){
+			result.push_back(path);
+			std::reverse(result.back().begin(), result.back().end());
+		} else{
+			for (auto w : father[word]){
+				calcpath(start, path, w, result);
+			}
+		}
+		path.pop_back();
+	}
+private:
+	std::unordered_set<std::string> dict;
+	std::unordered_set<std::string> visited;
+	std::unordered_map<std::string, std::vector<std::string>> father;
+};

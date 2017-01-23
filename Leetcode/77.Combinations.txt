@@ -1,0 +1,29 @@
+1.时间：O（（N-k）！）；空间：O（N）	->递归
+class Solution {
+public:
+	vector<vector<int>> combine(int n, int k) {
+		if (n == 0 || k == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		this->n = n;
+		this->k = k;
+		combine(1, path, result);
+		return result;
+	}
+private:
+	void combine(int start, std::vector<int>& path, std::vector<std::vector<int>>& result){
+		if (path.size() == k){
+			result.push_back(path);
+			return;
+		}
+		for (int i = start; i <= n; ++i){
+			path.push_back(i);
+			combine(i + 1, path, result);
+			path.pop_back();
+		}
+	}
+private:
+	int n;
+	int k;
+};
+2.时间：O（（N-k）！）；空间：O（N）	->迭代

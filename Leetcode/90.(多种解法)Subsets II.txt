@@ -1,0 +1,69 @@
+1.时间：O（2^N）；空间：O（N）	->递归
+class Solution {
+public:
+	vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		std::sort(nums.begin(), nums.end());//必须排序，不然结果错误（[4,4,4,1,4]）;
+		dfs(nums, path, nums.begin(), result);
+		return result;
+	}
+private:
+	void dfs(const std::vector<int>& S, std::vector<int>& path, std::vector<int>::iterator start, std::vector<std::vector<int>>& result){
+		result.push_back(path);
+
+		for (auto it = start; it < S.end(); ++it){
+			if (it != start && *it == *(it - 1)) continue;	//判断前后是否重复来避免重复
+			path.push_back(*it);
+			dfs(S, path, it + 1, result);
+			path.pop_back();
+		}
+	}
+};
+2.时间：O（2^N）；空间：O（N）	->递归
+class Solution {
+public:
+	vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		/* 利用unordered_map统计每个元素的个数 */
+		std::unordered_map<int ,int> count_map;
+		for_each(nums.begin(), nums.end(), [&count_map](int value){
+			if (count_map.find(value) != count_map.end()){
+				count_map[value]++;
+			}
+			else{
+				count_map[value] = 1;
+			}
+		});
+		/* 将map里的pair拷贝到一个数组中 */
+		std::vector<std::pair<int, int>> elems;
+		for_each(count_map.begin(), count_map.end(), [&elems](const std::pair<int, int>& pair){
+			elems.push_back(std::pair<int, int>(pair.first, pair.second));
+		});
+		/* 排序 */
+		std::sort(elems.begin(), elems.end());
+		dfs(nums, elems, path, 0, result);
+
+		return result;
+	}
+private:
+	void dfs(const std::vector<int>& S, const std::vector<std::pair<int, int>>& elems,
+		std::vector<int>& path, int step, std::vector<std::vector<int>>& result){
+		if (elems.size() == step){
+			result.push_back(path);
+			return;
+		}
+		for (int i = 0; i <= elems[step].second; ++i){
+			for (int k = 0; k < i; ++k){
+				path.push_back(elems[step].first);
+			}
+			dfs(S, elems, path, step + 1, result);
+			for (int k = 0; k < i; ++k){
+				path.pop_back();
+			}
+		}
+	}
+};

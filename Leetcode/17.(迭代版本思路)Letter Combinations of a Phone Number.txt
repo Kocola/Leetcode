@@ -1,0 +1,80 @@
+1.时间：O（3^N）;空间：O（N）	->代码命名比较混乱
+class Solution {
+public:
+	vector<string> letterCombinations(string digits) {
+		if (digits.size() == 0) return std::vector<std::string>();
+		std::vector<std::string> result;
+		std::string path;
+		/* 数字和字符串的映射 */
+		std::unordered_map<int, std::string> digitMap;
+		std::vector<string> tmp{"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+		for (int i = 0; i <= 9; ++i){
+			digitMap[i] = tmp[i];
+		}
+		dfs(digitMap, digits, 0, path, result);
+		return result;
+	}
+private:
+	void dfs(std::unordered_map<int, std::string>& digitMap, const std::string& S, 
+		int step, std::string& path, std::vector<std::string>& result){
+		if (step == S.size()){
+			result.push_back(path);
+			return;
+		}
+		const std::string digitStr = digitMap[S[step] - '0'];
+		for (int i = 0; i < digitStr.size(); ++i){
+			path.push_back(digitStr[i]);
+			dfs(digitMap, S, step + 1, path, result);
+			path.pop_back();
+		}
+	}
+};
+2.时间：O（3^N）;空间：O（N）	->递归
+class Solution {
+public:
+	vector<string> letterCombinations(string digits) {
+		if (digits.size() == 0) return std::vector<std::string>();
+		std::vector<std::string> result;
+		std::string path;
+		dfs(digits, 0, path, result);
+		return result;
+	}
+private:
+	void dfs(const std::string& digits, int step, std::string& path, std::vector<std::string>& result){
+		if (step == digits.size()){
+			result.push_back(path);
+			return;
+		}
+		for (auto ch : keyboard[digits[step] - '0']){
+			path.push_back(ch);
+			dfs(digits, step + 1, path, result);
+			path.pop_back();
+		}
+	}
+private:
+	const std::vector<std::string> keyboard{ "", "", "abc", "def", "ghi", "ljk", "mno", "pqrs", "tuv", "wxyz" };
+};
+3.时间：O（3^N）;空间：O（N）	->迭代
+class Solution {
+public:
+	vector<string> letterCombinations(string digits) {
+		if (digits.size() == 0) return std::vector<std::string>();
+		std::vector<std::string> result(1, "");
+		for (auto ch : digits){
+			const int m = result.size();
+			const int n = keyboard[ch - '0'].size();
+			result.resize(m * n);
+			for (int i = 1; i < n; ++i){
+				std::copy(result.begin(), result.begin() + m, result.begin() + m * i);
+			}
+			for (int i = 0; i < n; ++i){
+				for_each(result.begin() + m * i, result.begin() + m * (i + 1), [&](std::string& s){
+					s += keyboard[ch - '0'][i];
+				});
+			}
+		}
+		return result;
+	}
+private:
+	const std::vector<std::string> keyboard{ "", "", "abc", "def", "ghi", "ljk", "mno", "pqrs", "tuv", "wxyz" };
+};

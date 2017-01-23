@@ -1,0 +1,28 @@
+1.时间：O（N！）；空间：O（N）
+class Solution {
+public:
+	vector<vector<int>> permute(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		std::sort(nums.begin(), nums.end());
+		permute(nums, path, result);
+		return result;
+	}
+private:
+	void permute(const std::vector<int>& S, std::vector<int>& path, std::vector<std::vector<int>>& result){
+		if (path.size() == S.size()){
+			result.push_back(path);
+			return;
+		}
+		for (auto value : S){
+			/* 查找该value是否在path里出现过 */
+			auto pos = std::find(path.begin(), path.end(), value);
+			if (pos == path.end()){
+				path.push_back(value);
+				permute(S, path, result);
+				path.pop_back();
+			}
+		}
+	}
+};

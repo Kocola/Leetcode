@@ -1,0 +1,19 @@
+1.时间：O（LOG（M*N））；空间：O（1）
+class Solution {
+public:
+	bool searchMatrix(vector<vector<int>>& matrix, int target) {
+		if (matrix.size() == 0 || matrix[0].size() == 0) return false;
+		const int rows = matrix.size();
+		const int cols = matrix[0].size();
+		/* 区间[lower, upper)，左闭右开 */
+		int lower = 0, upper = rows * cols;
+		while (lower < upper){
+			int mid = lower + ((upper - lower) >> 1);
+			auto num = matrix[mid / cols][mid % cols];
+			if (num == target) return true;
+			else if (num < target) lower = mid + 1;
+			else upper = mid;
+		}
+		return false;
+	}
+};

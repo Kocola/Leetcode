@@ -1,0 +1,40 @@
+1.时间：O（N！）；空间：O（N）
+class Solution {
+public:
+	vector<vector<int>> permuteUnique(vector<int>& nums) {
+		if (nums.size() == 0) return std::vector<std::vector<int>>();
+		/* 用map统计各个元素的个数 */
+		std::unordered_map<int, int> count_map;
+		for_each(nums.begin(), nums.end(), [&count_map](int value){
+			if (count_map.find(value) != count_map.end()) count_map[value]++;
+			else count_map[value] = 1;
+		});
+		/* 将统计的数据存入vector */
+		std::vector<std::pair<int, int>> elems;
+		for_each(count_map.begin(), count_map.end(), [&elems](const std::pair<int, int>& a){
+			elems.push_back(a);
+		});
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		numsize = nums.size();
+		permuteUnique(elems, path, result);
+		return result;
+	}
+private:
+	void permuteUnique(const std::vector<std::pair<int, int>>&elems, std::vector<int>& path, std::vector<std::vector<int>>& result){
+		if (path.size() == numsize){
+			result.push_back(path);
+			return;
+		}
+		for (auto it = elems.begin(); it != elems.end(); ++it){
+			auto count = std::count(path.begin(), path.end(), it->first);
+			if (count < it->second){
+				path.push_back(it->first);
+				permuteUnique(elems, path, result);
+				path.pop_back();
+			}
+		}
+	}
+private:
+	int numsize;
+};

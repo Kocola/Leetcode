@@ -1,0 +1,49 @@
+1.时间：O（N）；空间：O（N）	->广度优先搜索
+class Solution {
+public:
+	int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+		if (beginWord.size() != endWord.size()) return 0;
+		/* 将wordList放到hashset中，加快搜索速度 */
+		for_each(wordList.begin(), wordList.end(), [&](const std::string& str){
+			dict.insert(str);
+		});
+		/* 设置两个queue，分别存放当前层和下一层 */
+		bool found = false;
+		int level = 0;
+		std::queue<std::string> curLevel, nextLevel;
+		curLevel.push(beginWord);
+		while (!curLevel.empty() && !found){
+			level++;
+			while (!curLevel.empty() && !found){
+				auto str = curLevel.front();
+				curLevel.pop();
+				auto nextStrs = nextAvaliableStrs(str);
+				for (auto str : nextStrs){
+					if (str == endWord) found = true;
+					nextLevel.push(str);
+				}
+			}
+			std::swap(curLevel, nextLevel);
+		}
+		return found ? level + 1 : 0;
+	}
+private:
+	std::vector<std::string> nextAvaliableStrs(std::string str){
+		std::vector<std::string> result;
+		for (int i = 0; i < str.size(); ++i){
+			for (char ch = 'a'; ch <= 'z'; ++ch){
+				if (str[i] == ch) continue;
+				std::swap(str[i], ch);
+				if (dict.count(str) > 0 && !visited.count(str)){
+					result.push_back(str);
+					visited.insert(str);
+				}
+				std::swap(str[i], ch);
+			}
+		}
+		return result;
+	}
+private:
+	std::unordered_set<std::string> dict;
+	std::unordered_set<std::string> visited;
+};

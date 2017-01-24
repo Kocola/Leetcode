@@ -1,0 +1,68 @@
+1.时间：O（）；空间：O（N）	->深度优先遍历 + 剪枝
+class Solution {
+public:
+	vector<string> restoreIpAddresses(string s) {
+		if (s.size() < 4) return std::vector<string>();	//如果总长度小于4，肯定不合法
+		std::vector<std::string> result;
+		dfs(s, 0, 0, "", result);
+		return result;
+	}
+private:
+	void dfs(const std::string& s, const int start, int step, std::string Ip,
+		std::vector<std::string>& result){
+		const int size = s.size();
+		if (step == 3){
+			if (size - start > 3) return;	//如果最后一个字段长度>3，则肯定不合法
+			std::string subIp = s.substr(start, size - start);
+			if (isvalid(subIp)){
+				Ip += subIp;
+				result.push_back(Ip);
+			}
+			return;
+		}
+		for (int len = 1; len <= 3; ++len){
+			int remainLen = size - (start + len);
+			if ((double)remainLen / (3 - step) > 3 || remainLen < (3 - step)) continue;	//如果剩余长度使剩余字段段长大于3，那么肯定不合法
+			std::string subIp = s.substr(start, len);
+			if (isvalid(subIp)){
+				dfs(s, start + len, step + 1, Ip + subIp + '.', result);
+			}
+		}
+	}
+	bool isvalid(const std::string& str){
+		/* 判断是否有先导0 */
+		return (str.size() == 1 || str[0] != '0') && atoi(str.c_str()) <= 255;
+	}
+};
+2.时间：O（）；空间：O（N）	->深度优先遍历 + 剪枝
+class Solution {
+public:
+	vector<string> restoreIpAddresses(string s) {
+		if (s.size() < 4) return std::vector<string>();	//如果总长度小于4，肯定不合法
+		std::vector<std::string> result;
+		dfs(s, 0, 0, "", result);
+		return result;
+	}
+private:
+	void dfs(const std::string& s, const int start, int step, std::string Ip,
+		std::vector<std::string>& result){
+		const int size = s.size();
+		if (step == 4 && size == start){
+			Ip.resize(Ip.size()- 1);	//去除多余的'.'
+			result.push_back(Ip);
+			return;
+		}
+		int remainLen = size - start;
+		if (remainLen > (4 - step) * 3 || remainLen < (4 - step)) return;	//剪枝
+		int num = 0;
+		//index < size，防止越界
+		for (int index = start; index < start + 3 && index < size; ++index){
+			num = num * 10 + s[index] - '0';
+			if (num <= 255){
+				Ip = Ip + s[index];
+				dfs(s, index + 1, step + 1, Ip + '.', result);
+			}
+			if (num == 0) break;	//不允许前导0，但允许单个0
+		}
+	}
+};

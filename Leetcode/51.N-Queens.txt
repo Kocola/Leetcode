@@ -1,0 +1,52 @@
+1.时间：O（N！）；空间：O（N）	->深度优先搜索+剪枝
+class Solution {
+public:
+	vector<vector<string>> solveNQueens(int n) {
+		if (n == 0) return std::vector<std::vector<std::string>>();
+		/* 初始化标记变量 */
+		colIndex = std::vector<int>(n, 0);
+		columns = std::vector<int>(n, 0);
+		main_diag = std::vector<int>(2*n, 0);
+		anti_diag = std::vector<int>(2*n, 0);
+		
+		std::vector<std::vector<std::string>> result;
+		dfs(0, n, result);
+
+		return result;
+	}
+private:
+	void dfs(int row, int rows, std::vector<std::vector<std::string>>& result){
+		if (row == rows){
+			std::vector<std::string> solution;
+			for (int i = 0; i < rows; ++i){
+				std::string str(rows, '.');
+				for (int k = 0; k < rows; ++k){
+					if (k == colIndex[i]){
+						str[k] = 'Q';
+						break;
+					}
+				}
+				solution.push_back(str);
+			}
+			result.push_back(solution);
+			return;
+		}
+		for (int i = 0; i < rows; ++i){
+			/* 判定是否满足放置皇后的条件 */
+			const bool ok = columns[i] == 0 && main_diag[i + row] == 0 &&
+				anti_diag[row - i + rows] == 0;
+			if (!ok) continue;	
+			columns[i] = main_diag[i + row] = anti_diag[row - i + rows] = 1;
+			colIndex[row] = i;
+			dfs(row + 1, rows, result);
+			/* 恢复状态 */
+			colIndex[row] = 0;
+			columns[i] = main_diag[i + row] = anti_diag[row - i + rows] = 0;
+		}
+	}
+private:
+	std::vector<int> colIndex;		//皇后在第i行的列号
+	std::vector<int> columns;		//表示已经放置的皇后占据了那些列
+	std::vector<int> main_diag;	//占据了哪些主对角线
+	std::vector<int> anti_diag;	//占据了哪些副对角线
+};

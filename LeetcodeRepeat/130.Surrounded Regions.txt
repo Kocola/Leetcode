@@ -1,0 +1,61 @@
+1.时间：O（N*M）；空间：O（N*M）
+class Solution {
+	typedef std::pair<int, int> state;
+public:
+	void solve(vector<vector<char>>& board) {
+		/* board无效，直接返回 */
+		if (board.size() == 0 || board.front().size() == 0) return;
+		/* 对四周的点BFS */
+		const int rows = board.size(), cols = board.front().size();
+		for (int i = 0; i < rows; ++i){
+			bfs(board, i, 0);
+			bfs(board, i, cols - 1);
+		}
+		for (int k = 1; k < cols - 1; ++k){
+			bfs(board, 0, k);
+			bfs(board, rows - 1, k);
+		}
+		/* 扫描bfs后的board，'+'->'O'，'O'->'X' */
+		for (int i = 0; i < rows; ++i){
+			for (int k = 0; k < cols; ++k){
+				if (board[i][k] == '+') board[i][k] = 'O';
+				else if (board[i][k] == 'O') board[i][k] = 'X';
+			}
+		}
+	}
+private:
+	void bfs(std::vector<std::vector<char>>& board, int x, int y){
+		const int rows = board.size();
+		const int cols = board.front().size();
+		std::queue<state> queue;
+
+		if (isvalid(board, x, y)){
+			board[x][y] = '+';
+			queue.push(state(x, y));
+		}
+		while (!queue.empty()){
+			auto curPoint = queue.front();
+			queue.pop();
+			auto nextPoints = extendPoints(board, curPoint.first, curPoint.second);
+			for (auto nextPoint : nextPoints) queue.push(nextPoint);
+		}
+	}
+	bool isvalid(std::vector<std::vector<char>>& board, int x, int y){
+		const int rows = board.size();
+		const int cols = board.front().size();
+		if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] != 'O')
+			return false;
+		return true;
+	}
+	std::vector<state> extendPoints(std::vector<std::vector<char>>& board, int x, int y){
+		std::vector<state> result;
+		const state (&directions)[4] = { { x - 1, y }, { x + 1, y }, { x, y - 1 }, { x, y + 1 } };
+		for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); ++i){
+			if (isvalid(board, directions[i].first, directions[i].second)){
+			    board[directions[i].first][directions[i].second] = '+'; //每次有效判断通过后,将该点置为'+'
+				result.push_back(directions[i]);
+			}
+		}
+		return result;
+	}
+};

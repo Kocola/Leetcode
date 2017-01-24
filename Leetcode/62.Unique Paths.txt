@@ -1,0 +1,126 @@
+1.时间：O（）；空间：O（N）	->深搜，超时
+class Solution {
+public:
+	int uniquePaths(int m, int n) {
+		if (m == 0 || n == 0) return 0;
+		if (m == 1 || n == 1) return 1;
+		int totalpathnum = 0;
+		int startX = 0, startY = 0;
+		std::vector<std::vector<int>> visited(m, std::vector<int>(n, 0));
+		dfs(startX, startY, m, n, totalpathnum, visited);
+		return totalpathnum;
+	}
+private:
+	void dfs(int x, int y, const int& rows, const int& cols,
+		int& totalpathNum, std::vector<std::vector<int>>& visited){
+		if (x == rows - 1 && y == cols - 1){
+			totalpathNum += 1;
+			return;
+		}
+		const std::pair<int, int> directions[2] = { { x + 1, y }, { x, y + 1 } };
+		for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); ++i){
+			int curX = directions[i].first, curY = directions[i].second;
+			if (isvalid(curX, curY, rows, cols, visited)){
+				visited[curX][curY] = 1;
+				dfs(curX, curY, rows, cols, totalpathNum, visited); 
+				visited[curX][curY] = 0;
+			}
+		}
+	}
+	bool isvalid(int x, int y, const int& rows, const int& cols, 
+		std::vector<std::vector<int>>& visited){
+		if (x < 0 || x >= rows || y < 0 || y >= cols || visited[x][y])
+			return false;
+		return true;
+	}
+};
+2.时间：O（）；空间：O（N）	->深搜，超时
+class Solution {
+public:
+	int uniquePaths(int m, int n) {
+		if (m <= 0 || n <= 0) return 0;
+		if (m == 1 || n == 1) return 1;
+		return uniquePaths(m - 1, n) + uniquePaths(m, n - 1);
+	}
+};
+3.时间：O（M*N）;空间：O（M*N）	->深搜+缓存（备忘录）自顶向下
+class Solution {
+public:
+	/* 深搜+缓存，即备忘录法 */
+	int uniquePaths(int m, int n) {
+		if (m <= 0 || n <= 0) return 0;
+		if (m == 1 || n == 1) return 1;
+		std::vector<std::vector<int>> buffer(m + 1, std::vector<int>(n + 1, 0));
+		return dfs(m, n, buffer);
+	}
+private:
+	int dfs(int x, int y, std::vector<std::vector<int>>& buffer){
+		if (x <= 0 || y <= 0) return 0;
+		if (x == 1 || y == 1) return 1;
+		return getOrUpdate(x - 1, y, buffer) + getOrUpdate(x, y - 1, buffer);
+	}
+	int getOrUpdate(int x, int y, std::vector<std::vector<int>>& buffer){
+		if (buffer[x][y] > 0) return buffer[x][y];
+		else return buffer[x][y] = dfs(x, y, buffer);
+	}
+};
+4.时间：O（M*N）;空间：O（N）	->动态规划
+class Solution {
+public:
+	/* 动规，滚动数组，列 */
+	int uniquePaths(int m, int n) {
+		if (m <= 0 || n <= 0) return 0;
+		if (m == 1 || n == 1) return 1;
+		std::vector<int> f(n, 0);
+		f[0] = 1;
+		for (int i = 0; i < m; ++i){
+			for (int k = 1; k < n; ++k){
+				f[k] = f[k - 1] + f[k];
+			}
+		}
+		return f[n-1];
+	}
+};
+5.时间：O（M*N）;空间：O（M）	->动态规划
+class Solution {
+public:
+	/* 动规，滚动数组，行 */
+	int uniquePaths(int m, int n) {
+		if (m <= 0 || n <= 0) return 0;
+		if (m == 1 || n == 1) return 1;
+		std::vector<int> f(m, 0);
+		f[0] = 1;
+		for (int i = 0; i < n; ++i){
+			for (int k = 1; k < m; ++k){
+				f[k] = f[k] + f[k - 1];
+			}
+		}
+		return f[m-1];
+	}
+};
+3.时间：O（）；空间：O（1）	->数学公式
+class Solution {
+	typedef long long LL;
+public:
+	/* 利用数学公式
+		一个m行，n列的矩阵，机器人从左上走到右下总共需要的步数是m+n-2，
+		其中向下走的步数是m-1，因此问题变成了在m+n-2个操作中，
+		选择m-1个时间点向下走，选择方式有多少种，即C(m+n-2)(m-1)*/
+	int uniquePaths(int m, int n) {
+		return combination(m + n - 2, std::max(m - 1, n - 1));
+	}
+private:
+	LL factor(int upper, int start = 1){
+		LL result = 1;
+		for (int i = start; i <= upper; ++i){
+			result = result * i;
+		}
+		return result;
+	}
+	int combination(int n, int k){
+		/* 常数优化 */
+		if (k == 0) return 1;
+		if (k == 1) return n;
+		return factor(n, k + 1) / factor(n - k);
+	}
+};

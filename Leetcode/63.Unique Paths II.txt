@@ -1,0 +1,82 @@
+1.时间：O（M*N）；空间：O（M*N）
+class Solution {
+public:	/* 深搜+缓存（备忘录） */
+	int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+		if (obstacleGrid.size() <= 0 || obstacleGrid.front().size() <= 0) return 0;
+		const int rows = obstacleGrid.size(), cols = obstacleGrid.front().size();
+		std::vector<std::vector<int>> buffer(rows, std::vector<int>(cols, 0));
+		return dfs(obstacleGrid, buffer, rows - 1, cols - 1);
+	}
+private:
+	int dfs(const std::vector<std::vector<int>>&obstacleGrid, std::vector<std::vector<int>>& buffer, int row, int col){
+		if (row < 0 || col < 0) return 0;	//数据非法
+		if (obstacleGrid[row][col] == 1) return 0;
+		if (row == 0 && col == 0) return 1;
+		return getOrUpdate(obstacleGrid, buffer, row - 1, col) + getOrUpdate(obstacleGrid, buffer, row, col - 1);
+	}
+
+	int getOrUpdate(const std::vector<std::vector<int>>&obstacleGrid, std::vector<std::vector<int>>& buffer, int row, int col){
+	    if(row < 0 || col < 0) return 0;
+		if (buffer[row][col] > 0) return buffer[row][col];
+		else return buffer[row][col] = dfs(obstacleGrid, buffer, row, col);
+	}
+};
+2.时间：O（M*N）;空间：O（M*N）	->深搜+缓存（备忘录）
+class Solution {
+public:
+	int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+		if (obstacleGrid.size() == 0 || obstacleGrid.front().size() == 0) return 0;
+		const int rows = obstacleGrid.size(), cols = obstacleGrid.front().size();
+		std::vector<std::vector<int>> buffer(rows + 1, std::vector<int>(cols + 1, 0));
+		return dfs(obstacleGrid, buffer, rows, cols);
+	}
+private:
+	int dfs(const std::vector<std::vector<int>>& obstacleGrid, std::vector<std::vector<int>>& buffer,
+		int row, int col){
+		if (row < 1 || col < 1) return 0;	//非法数据
+		if (obstacleGrid[row][col] == 1) return 0;	//如果是障碍，直接返回0
+		if (row == 1 && col == 1) return 1;	//到达起点
+		return getOrUpdate(obstacleGrid, buffer, row - 1, col) + getOrUpdate(obstacleGrid, buffer, row, col - 1);
+	}
+	int getOrUpdate(const std::vector<std::vector<int>>& obstacleGrid, std::vector<std::vector<int>>& buffer,
+		int row, int col){
+		if (buffer[row][col] > 0) return buffer[row][col];
+		else return buffer[row][col] = dfs(obstacleGrid, buffer, row, col);
+	}
+};
+3.时间：O（M*N）;空间：O（min（M，N））	->动态规划
+class Solution {
+public:
+	int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+		if (obstacleGrid.size() == 0 || obstacleGrid.front().size() == 0) return 0;
+		if (obstacleGrid[0][0] == 1) return 0;	//如果起点是障碍，返回0
+		const int rows = obstacleGrid.size(), cols = obstacleGrid.front().size();
+		if (obstacleGrid[rows - 1][cols - 1] == 1) return 0;	//如果终点是障碍，返回0
+		std::vector<int> dp(cols, 0);
+		dp[0] = 1;
+		for (int i = 0; i < rows; ++i){
+			for (int k = 1; k < cols; ++k){
+			    dp[k - 1] = obstacleGrid[i][k-1] == 0 ? dp[k-1] : 0;
+				if (obstacleGrid[i][k] == 1) dp[k] = 0;
+				else dp[k] = dp[k - 1] + dp[k];
+			}
+		}
+		return dp[cols-1];
+	}
+};
+4.时间：O（M*N）;空间：O（min（M，N））	->动态规划
+class Solution {
+public:
+	int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+		if (obstacleGrid.size() == 0 || obstacleGrid.front().size() == 0) return 0;
+		const int rows = obstacleGrid.size(), cols = obstacleGrid.front().size();
+		std::vector<int> dp(cols, 0);
+		dp[0] = obstacleGrid[0][0] == 0 ? 1 : 0;
+		for (int i = 0; i < rows; ++i){
+			for (int k = 0; k < cols; ++k){
+				dp[k] = obstacleGrid[i][k] != 0 ? 0 : (k == 0 ? dp[k] : dp[k - 1] + dp[k]);
+			}
+		}
+		return dp[cols-1];
+	}
+};

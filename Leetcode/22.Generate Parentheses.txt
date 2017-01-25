@@ -1,0 +1,58 @@
+1.时间：O（）；空间：O（N）
+class Solution {
+public:
+	vector<string> generateParenthesis(int n) {
+		if (n == 0) return std::vector<std::string>{std::string("")};
+		if (n == 1) return std::vector<std::string>{std::string("()")};	//n == 1时，仅有该结果
+		std::vector<std::string> result;
+		dfs(n, 0, 0, "", result);
+		return result;
+	}
+private:
+	void dfs(const int N, int leftbrackets, int rightbrackets, std::string str, std::vector<std::string>& result){
+		if (leftbrackets >= N + 1) return;
+		if (leftbrackets + rightbrackets == 2 * N){
+			result.push_back(str);
+			return;
+		}
+		dfs(N, leftbrackets + 1, rightbrackets, str + '(', result);
+		if (leftbrackets > rightbrackets) dfs(N, leftbrackets, rightbrackets + 1, str + ')', result);
+	}
+};
+2.时间：O（）；空间：O（N）
+class Solution {
+public:
+	vector<string> generateParenthesis(int n) {
+		if (n == 0) return std::vector<std::string>{std::string("")};
+		if (n == 1) return std::vector<std::string>{std::string("()")};	//n == 1时，仅有该结果
+		std::vector<std::string> result;
+		dfs(n, 0, 0, "", result);
+		return result;
+	}
+private:
+	void dfs(const int N, int leftbrackets, int rightbrackets, std::string str, std::vector<std::string>& result){
+		if (leftbrackets == N){
+			result.push_back(str + std::string(leftbrackets - rightbrackets, ')'));
+			return;
+		}
+		dfs(N, leftbrackets + 1, rightbrackets, str + '(', result);
+		if (leftbrackets > rightbrackets) dfs(N, leftbrackets, rightbrackets + 1, str + ')', result);
+	}
+};
+3.
+class Solution {
+public:
+	vector<string> generateParenthesis(int n) {
+		if (n == 0) return std::vector<std::string>{std::string("")};	//n == 0时，返回空字符串
+		if (n == 1) return std::vector<std::string>{std::string("()")};	//n == 1时，仅有该结果
+		std::vector<std::string> result;
+		for (int i = 0; i < n; ++i){
+			for (auto inner : generateParenthesis(i)){
+				for (auto outter : generateParenthesis(n - 1 - i)){
+					result.push_back(std::string("(" + inner + ")" + outter));
+				}
+			}
+		}
+		return result;
+	}
+};

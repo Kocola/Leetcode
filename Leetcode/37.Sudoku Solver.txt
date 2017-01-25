@@ -1,0 +1,43 @@
+1.时间：O（）；空间：O（N）
+class Solution {
+public:
+	void solveSudoku(vector<vector<char>>& board) {
+		solve(board);
+	}
+private:
+	bool solve(std::vector<std::vector<char>>& board){
+		for (int i = 0; i < 9; ++i){
+			for (int j = 0; j < 9; ++j){
+				if (board[i][j] == '.'){
+					for (int k = 0; k < 9; ++k){
+						board[i][j] = '1' + k;
+						if (isvalid(board, i, j) && solve(board)) return true;
+						board[i][j] = '.';
+					}
+					return false;//尝试所有1~9后均不行，说明不存在解，直接返回false
+				}
+			}
+		}
+		return true;	//以上没有返回false，说明已经全部解完，返回true
+	}
+	bool isvalid(std::vector<std::vector<char>>& board, int x, int y){
+		//判断行
+		for (int i = 0; i < 9; ++i){
+			if (i != x && board[x][y] == board[i][y])
+				return false;
+		}
+		//判断列
+		for (int j = 0; j < 9; ++j){
+			if (j != y && board[x][y] == board[x][j])
+				return false;
+		}
+		//判断当前九宫格
+		for (int i = 3 * (x / 3); i < 3 * (x / 3 + 1); ++i){
+			for (int j = 3 * (y / 3); j < 3 * (y / 3 + 1); ++j){
+				if ((i != x || j != y) && board[x][y] == board[i][j])
+					return false;
+			}
+		}
+		return true;
+	}
+};

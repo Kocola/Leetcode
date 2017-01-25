@@ -1,0 +1,44 @@
+1.Ê±¼ä£ºO£¨N£¡£©£»¿Õ¼ä£ºO£¨N^2£©
+class Solution {
+public:
+	bool exist(vector<vector<char>>& board, string word) {
+		if (word.size() == 0) return true;
+		if (board.size() == 0 || board.front().size() == 0) return false;
+		const int rows = board.size();
+		const int cols = board.front().size();
+		std::vector<std::vector<bool>> visited(rows, std::vector<bool>(cols, false));
+		for (int i = 0; i < rows; ++i){
+			for (int k = 0; k < cols; ++k){
+				if (board[i][k] == word[0]){
+					visited[i][k] = true;
+					if (dfs(board, word.substr(1, word.size() - 1), "", i, k, 0, visited)) return true;
+					visited[i][k] = false;
+				}
+			}
+		}
+		return false;
+	}
+private:
+	bool dfs(std::vector<std::vector<char>>& board, const std::string& word, std::string str, int x, int y,
+		int step, std::vector<std::vector<bool>>& visited){
+		if (step == word.size()){
+			return true;
+		}
+		const std::pair<int, int> directions[4] = { { x - 1, y }, { x + 1, y }, { x, y - 1 }, { x, y + 1 } };
+		for (int i = 0; i < sizeof(directions) / sizeof(directions[0]); ++i){
+			int curX = directions[i].first, curY = directions[i].second;
+			if (str.size() < word.size() && isvalid(board, curX, curY, word[step]) && !visited[curX][curY]){
+				visited[curX][curY] = true;
+				if (dfs(board, word, str + board[curX][curY], curX, curY, step + 1, visited)) return true;
+				visited[curX][curY] = false;
+			}
+		}
+		return false;
+	}
+	bool isvalid(const std::vector<std::vector<char>>& board, int x, int y, const char ch){
+		const int rows = board.size(), cols = board.front().size();
+		if (x < 0 || x >= rows || y < 0 || y >= cols || board[x][y] != ch)
+			return false;
+		return true;
+	}
+};

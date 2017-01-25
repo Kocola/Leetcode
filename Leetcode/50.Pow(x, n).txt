@@ -1,0 +1,15 @@
+1.时间：O（）；空间：O（N）
+class Solution {
+public:
+	double myPow(double x, int n) {
+		if (n < 0) return 1.0 / (pow(x, -(n + 1)) * x) ;	//n有可能是负数
+		else return pow(x, n);
+	}
+private:
+	double pow(double x, int n){
+		if (n == 0) return 1;
+		if (n == 1) return x;
+		double v = pow(x, n >> 1);
+		return (n & 1) ? v * v * x: v * v;
+	}
+};

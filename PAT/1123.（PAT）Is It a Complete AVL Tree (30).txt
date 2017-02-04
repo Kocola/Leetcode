@@ -1,0 +1,125 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+struct TreeNode {
+    int val;
+    int left_height, right_hight;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {
+		left_height = right_hight = 0;
+    }
+};
+
+bool isCompleteBinaryTree(TreeNode* root){
+	if (root == nullptr) return false;
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+	bool isOver = false;
+	while (!queue.empty()){
+		auto node = queue.front();
+		queue.pop();
+		if (node->left != nullptr){
+			if (isOver == true) return false;
+			queue.push(node->left);
+		}else{
+			isOver = true;
+		}
+		if (node->right != nullptr){
+			if (isOver == true) return false;
+			queue.push(node->right);
+		}else{
+			isOver = true;
+		}
+	}
+	return true;
+}
+
+void lRotate(TreeNode* &root){	//左旋
+	auto tmp = root;
+	root = root->right;
+	tmp->right =root->left ;
+	root->left = tmp;
+
+	tmp->right_hight = root->left_height;
+	root->left_height = std::max(tmp->left_height, tmp->right_hight) + 1;
+}
+
+void rRotate(TreeNode* &root){	//右旋
+	auto tmp = root;
+	root = root->left;
+	tmp->left = root->right;
+	root->right = tmp;
+
+	tmp->left_height = root->right_hight;
+	root->right_hight = std::max(tmp->left_height, tmp->right_hight) + 1;
+}
+
+void rotate(TreeNode* &root){	//调整树使其平衡
+	if (root->left_height - root->right_hight < 0){ //R
+		if (root->right->left_height - root->right->right_hight < 0){	//RR
+			lRotate(root);
+		}else{	//RL
+			rRotate(root->right);
+			lRotate(root);
+		}
+	}else{	//L
+		if (root->left->left_height - root->left->right_hight < 0){	//LR
+			lRotate(root->left);
+			rRotate(root);
+		}else{	//LL
+			rRotate(root);
+		}
+	}
+}
+
+void levelTravel(TreeNode* root){
+	if (root == nullptr) return;
+	std::queue<TreeNode*> queue;
+	queue.push(root);
+	while (!queue.empty()){
+		auto node = queue.front();
+		queue.pop();
+		if (node == root) std::cout << node->val;
+		else std::cout << " "<<node->val;
+		if (node->left != nullptr) queue.push(node->left);
+		if (node->right != nullptr) queue.push(node->right);
+	}
+	std::cout << std::endl;
+}
+
+int createTree(TreeNode* &root, int num){
+	if (root == nullptr){
+		root = new TreeNode(num);
+		return 0;
+	}
+	if (num <= root->val){
+		root->left_height = createTree(root->left, num) + 1;
+	}
+	else{
+		root->right_hight = createTree(root->right, num) + 1;
+	}
+	int height_diff = std::abs(root->left_height - root->right_hight);
+	if (height_diff > 1) rotate(root);
+	return std::max(root->left_height, root->right_hight);
+}
+
+int main(){
+	int size = 0;
+	std::cin >> size;
+	TreeNode* root = nullptr;
+	for (int i = 0; i < size; ++i){
+		int num = 0;
+		std::cin >> num;
+		createTree(root, num);
+	}
+	levelTravel(root);
+	if (isCompleteBinaryTree(root)) std::cout << "YES" << std::endl;
+	else std::cout << "NO" << std::endl;
+
+	return 0;
+}

@@ -1,0 +1,71 @@
+1.时间：O（）；空间：O（N）		->超时
+class Solution {
+public:
+	bool canJump(vector<int>& nums) {
+		std::vector<int> canJumpVec(nums.size(), -1);//-1表示未访问过，0表示不可达，1表示可达
+		return canJump(nums, canJumpVec, 0);
+	}
+private:
+	bool canJump(const std::vector<int>& nums, std::vector<int>& canJumpVec, int index){
+		if (index == nums.size() - 1) return true;
+		int len = nums[index];
+		for (int i = 1; i <= len; ++i){
+			if (canJumpVec[index + i] == -1){
+				if (canJump(nums, canJumpVec, index + i)){
+					canJumpVec[index + i] = 1;
+					return true;
+				}
+			}
+			else if (canJumpVec[index + i] == 1) return true;
+		}
+		canJumpVec[index] = 0;
+		return false;
+	}
+};
+2.时间：O（N）；空间：O（1）	->贪心
+class Solution {
+public:
+	/* 正向，从0出发，一层一层往上跳，看最后能不能超过最高层，能超过，说明能到达，
+		否则不能到达*/
+	bool canJump(vector<int>& nums) {
+		if (nums.size() == 0) return true;
+		return canJump(nums, 0);
+	}
+private:
+	bool canJump(const std::vector<int>& nums, int index){
+		int reach = 1;	//最右可以跳到哪里
+		for (int i = 0; i < reach && reach < nums.size(); ++i){
+			reach = std::max(reach, i + 1 + nums[i]);	//当前下标+1表示跳0步可达的位置，+nums[i]表示跳nums[i]步可达的位置
+		}
+		return reach >= nums.size();
+	}
+};
+3.时间：O（N）；空间：O（1）	->贪心
+class Solution {
+public:
+	/* 逆向，从最高层下楼梯，一层一层下降，看最后能不能下降到0层 */
+	bool canJump(vector<int>& nums) {
+		if (nums.size() == 0) return true;
+		int reachLeft = nums.size() - 1;
+		for (int i = nums.size() - 2; i >= 0; --i){
+			if (i + nums[i] >= reachLeft) reachLeft = i;
+		}
+		return reachLeft <= 0;
+	}
+};
+4.时间：O（N）；空间：O（N）	->动态规划
+class Solution {
+public:
+	/* 动规，设状态为dp[i]，表示从第0层出发，走到第i层时剩余的最大步数，则，状态转移方程是：
+		dp[i] = max(dp[i-1], nums[i-1]) - 1, i > 0 */
+	bool canJump(vector<int>& nums) {
+		if (nums.size() == 0) return true;
+		std::vector<int> dp(nums.size(), 0);
+		dp[0] = 0;
+		for (int i = 1; i < nums.size(); ++i){
+			dp[i] = std::max(dp[i - 1], nums[i - 1]) - 1;
+			if (dp[i] < 0) return false;	//表示不可达
+		}
+		return true;
+	}
+};

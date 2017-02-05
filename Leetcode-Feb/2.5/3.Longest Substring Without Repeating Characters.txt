@@ -1,0 +1,18 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int lengthOfLongestSubstring(string s) {
+		if (s.size() < 2) return s.size();
+		std::vector<int> hashtable(128, -1);	/* -1表示未出现该字符 */
+		int start = 0;	/* 当前未重复子字符串的起始下标 */
+		int maxLen = 0;
+		for (int i = 0; i < s.size(); ++i){
+			if (hashtable[s[i] - '\0'] >= start){
+				maxLen = std::max(maxLen, i - start);
+				start = hashtable[s[i] - '\0'] + 1;	/* 起始位置为该字符原下标的下一个位置，不能是start++，例子：（"abcdacbd"） */
+			}
+			hashtable[s[i] - '\0'] = i;
+		}
+		return std::max(maxLen, (int)s.size() - start);	/* 最后更新最大长度，例子：（"abcdabcde"） */
+	}
+};

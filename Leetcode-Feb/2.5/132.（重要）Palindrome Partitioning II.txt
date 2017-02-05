@@ -1,0 +1,50 @@
+1.时间：O（N^2）;空间：O（N）	->动态规划
+class Solution {
+public:
+	/* 从i往右扫描，每找到一个回文就算一次dp，转换为f（i）= 区间[i，n-1]之间最小的
+		cut数，n为字符串长度，则状态转移方程为
+		f(i) = min{f(j+1) + 1}，i<=j<=n*/
+	int minCut(string s) {
+		if (s.size() < 2) return 0;
+		std::vector<int> cuts(s.size() + 1, 0);
+		/* 初始化cuts，默认不存在任何回文子串，cuts[s.size()] = -1 */
+		for (int i = 0; i <= s.size(); ++i){
+			cuts[i] = s.size() - 1 - i;
+		}
+		std::vector<std::vector<int>> is_str(s.size(), std::vector<int>(s.size(), 0));	//is_str[i][j]表示s的[i,j]子字符串是否是回文
+		for (int i = s.size() - 2; i >= 0; --i){
+			for (int k = i; k < s.size(); ++k){
+				if (s[i] == s[k] && (k - i < 2 || is_str[i+1][k-1] == 1)){
+					is_str[i][k] = 1;
+					cuts[i] = std::min(cuts[i], cuts[k + 1] + 1);
+				}
+			}
+		}
+		return cuts[0];
+	}
+};
+2.时间：O（N^2）;空间：O（N）	->动态规划
+class Solution {
+public:
+	/* 从i往左扫描，每找到一个回文就算一次dp，转换为f（i）= 区间[0,i]之间最小的
+		cut数，n为字符串长度，则状态转移方程为
+		f(i) = min{f(j-1) + 1}，1<=j<=i*/
+	int minCut(string s) {
+		if (s.size() < 2) return 0;
+		std::vector<int> cuts(s.size() + 1, 0);
+		/* 初始化cuts，默认不存在任何回文子串，cuts[0] = -1 */
+		for (int i = 0; i <= s.size(); ++i){
+			cuts[i] = i - 1;
+		}
+		std::vector<std::vector<int>> is_str(s.size() + 1, std::vector<int>(s.size() + 1, 0));	//is_str[i][j]表示s的[i,j]子字符串是否是回文
+		for (int i = 1; i <= s.size(); ++i){
+			for (int k = 1; k <= i; ++k){
+				if (s[i-1] == s[k-1] && (i - k < 2 || is_str[i - 1][k + 1])){
+					is_str[i][k] = 1;
+					cuts[i] = std::min(cuts[i], cuts[k - 1] + 1);
+				}
+			}
+		}
+		return cuts[s.size()];
+	}
+};

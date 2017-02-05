@@ -1,0 +1,16 @@
+1.时间：O（N）；空间：O（N）	->空间O（1）的话会破坏原有数据
+class Solution {
+public:
+	/* 转移方程：dp[i][j] = min(dp[i+1][j], dp[i+1][j+1]) */
+	int minimumTotal(vector<vector<int>>& triangle) {
+		if (triangle.size() == 0 || triangle.front().size() == 0) return 0;
+		if (triangle.size() == 1) return triangle[0][0];
+		std::vector<int> dp = triangle.back();	/* 将最后一行赋值给dp */
+		for (int i = triangle.size() - 2; i >= 0; --i){
+			for (int k = 0; k <= i; ++k){
+				dp[k] = std::min(dp[k], dp[k + 1]) + triangle[i][k];
+			}
+		}
+		return dp[0];
+	}
+};

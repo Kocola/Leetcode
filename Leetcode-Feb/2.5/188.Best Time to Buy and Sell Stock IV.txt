@@ -1,0 +1,28 @@
+1.时间：O（N*K）；空间：O（K）
+class Solution {
+public:
+	/* 思路参考：http://blog.csdn.net/ljiabin/article/details/44900389 */
+	int maxProfit(int k, vector<int>& prices) {
+		if (prices.size() < 2) return 0;
+		/* 如果k > prices一半大小，那么采用II中的策略，这样可以加快速度 */
+		if (k >= prices.size() / 2){
+			int result = 0;
+			for (int i = 1; i < prices.size(); ++i){
+				int diff = prices[i] - prices[i - 1];
+				if (diff > 0) result += diff;
+			}
+			return result;
+		}
+		/* 采用动态规划实现 */
+		std::vector<int> localdp(k + 1, 0);
+		std::vector<int> glocaldp(k + 1, 0);
+		for (int i = 1; i < prices.size(); ++i){
+			int diff = prices[i] - prices[i - 1];
+			for (int j = k; j >= 1; --j){
+				localdp[j] = std::max(glocaldp[j - 1] + std::max(diff, 0), localdp[j] + diff);
+				glocaldp[j] = std::max(glocaldp[j], localdp[j]);
+			}
+		}
+		return glocaldp[k];
+	}
+};

@@ -1,0 +1,79 @@
+1.时间：O（N）；空间：O（N）	-> 基于84.Largest Rectangle in Histogram
+class Solution {
+public:
+	/* 基于84.Largest Rectangle in Histogram */
+	int maximalRectangle(vector<vector<char>>& matrix) {
+		if (matrix.size() == 0 || matrix.front().size() == 0) return 0;
+		std::vector<int> heights(matrix.front().size(), 0);
+		int result = 0;
+		const int rows = matrix.size();
+		const int cols = matrix.front().size();
+		for (int i = 0; i < rows; ++i){
+			for (int k = 0; k < cols; ++k){
+				if (matrix[i][k] == '1'){
+					heights[k] = heights[k] + 1;
+				} else{
+					heights[k] = 0;
+				}
+			}
+			result = std::max(result, largeRectangleArea(heights));
+		}
+		return result;
+	}
+private:
+	int largeRectangleArea(std::vector<int>& heights){
+		if (heights.size() == 0) return 0;
+		heights.push_back(0);	//添加0，避免存在未计算的情况（例子：[3，2，1，4，5，6]时，如果不加0，最后4，5，6不会被计算）
+		int result = 0;
+		std::stack<int> stk;	//维护一个递增序列栈
+		for (int i = 0; i < heights.size();){
+			if (stk.empty() || heights[i] > heights[stk.top()]){
+				stk.push(i++);
+			}else{
+				int tmp = stk.top();
+				stk.pop();
+				result = std::max(result, heights[tmp] * (stk.empty() ? i : (i - stk.top() - 1)));
+			}
+		}
+		heights.pop_back();	//恢复原有的heights；
+		return result;
+	}
+};
+2.时间：O（N）；空间：O（N）	-> 动态规划
+class Solution {
+public:
+	/* 基于84.Largest Rectangle in Histogram */
+	int maximalRectangle(vector<vector<char>>& matrix) {
+		if (matrix.size() == 0 || matrix.front().size() == 0) return 0;
+		const int rows = matrix.size(), cols = matrix.front().size();
+		std::vector<int>left_bound(cols, 0), right_bound(cols, cols);	//左闭右开
+		std::vector<int>heights(cols, 0);
+		int result = 0;
+		for (int i = 0; i < rows; ++i){
+			int cur_left = 0, cur_right = cols;
+			/* 更新heights */
+			for (int k = 0; k < cols; ++k){
+				heights[k] = matrix[i][k] == '1' ? heights[k] + 1 : 0;
+			}
+			/* 更新当前行left_bound */
+			for (int k = 0; k < cols; ++k){
+				/* std::max(cur_left, left_bound[k])和std::min(cur_right, right_bound[k])确保
+					以k为中心的[left_bound[k], right_bound[k]]区间内的heights值均>= heights[k]*/
+				left_bound[k] = matrix[i][k] == '1' ? std::max(cur_left, left_bound[k]) : 0;
+				/*left_bound[k] = matrix[i][k] == '1' ? cur_left : 0;*/
+				cur_left = matrix[i][k] == '1' ? cur_left : k + 1;
+			}
+			/* 更新right_bound */
+			for (int k = cols - 1; k >= 0; --k){
+				right_bound[k] = matrix[i][k] == '1' ? std::min(cur_right, right_bound[k]) : cols;
+				/*right_bound[k] = matrix[i][k] == '1' ? cur_right : cols;*/
+				cur_right = matrix[i][k] == '1' ? cur_right : k;
+			}
+			/* 更新当前行最大rectangle */
+			for (int k = 0; k < cols; ++k){
+				result = std::max(result, heights[k] * (right_bound[k] - left_bound[k]));
+			}
+		}
+		return result;
+	}
+};

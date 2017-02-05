@@ -1,0 +1,38 @@
+1.时间：O（N）；空间：O（1）	->动态规划
+/* 设状态为f[j]，表示以S[j]结尾的最大连续子序列和，现状态转移方程如下：
+    f[j] = max{f[j-1] + S[j], S[j]}，其中1<= j <= n 
+    target = max{f[j]}, 其中1<= j <= n
+*/
+class Solution {
+public:
+	int maxSubArray(vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+		int dp = 0;
+		int result = std::numeric_limits<int>::min();//[-1]时返回-1而不是0
+		for (int i = 0; i < nums.size(); ++i){
+			dp = std::max(nums[i], dp + nums[i]);
+			result = std::max(result, dp);
+		}
+		return result;
+	}
+};
+2.时间：O（N）；空间：O（N）	->对O（N^2）的算法进行优化
+class Solution {
+public:
+	int maxSubArray(vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+		std::vector<int> sum(nums.size(), 0);
+		sum[0] = nums[0];
+		/* 预处理，获取累加和 */
+		for (int i = 1; i < nums.size(); ++i){
+			sum[i] = sum[i - 1] + nums[i];
+		}
+		int cur_min = 0;
+		int result = std::numeric_limits<int>::min();
+		for (int i = 0; i < nums.size(); ++i){
+			result = std::max(result, sum[i] - cur_min);
+			cur_min = std::min(cur_min, sum[i]);
+		}
+		return result;
+	}
+};

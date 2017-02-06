@@ -1,0 +1,171 @@
+1.时间：O（）；空间：O（N）	->递归，超时（仅示例算法原理）
+class Solution {
+	typedef std::string::iterator Iterator;
+public:
+	bool isScramble(string s1, string s2) {
+		if (s1.size() != s2.size()) return false;
+		return isScramble(s1.begin(), s1.end(), s2.begin());
+	}
+private:
+	bool isScramble(Iterator first1, Iterator last1, Iterator first2){
+		int len = std::distance(first1, last1);
+		Iterator last2 = std::next(first2, len);
+
+		/* 递归结束条件，剩余一个字符 */
+		if (len == 1) return *first1 == *first2;
+
+		for (int i = 1; i < len; ++i){
+			if ((isScramble(first1, first1 + i, first2) && isScramble(first1 + i, last1, first2 + i)
+				|| (isScramble(first1 + i, last1, first2) && isScramble(first1, first1 + i, last2 - i)))){
+				return true;
+			}
+		}
+		return false;
+	}
+};
+2.时间：O（）；空间：O（N） 	->递归+剪枝
+class Solution {
+	typedef std::string::iterator Iterator;
+public:
+	bool isScramble(string s1, string s2) {
+		if (s1.size() != s2.size()) return false;
+		return isScramble(s1.begin(), s1.end(), s2.begin());
+	}
+private:
+	bool isScramble(Iterator first1, Iterator last1, Iterator first2){
+		int len = std::distance(first1, last1);
+		Iterator last2 = std::next(first2, len);
+
+		/* 递归结束条件，只剩一个字符 */
+		if (len == 1) return *first1 == *first2;
+
+		/* 剪枝，如果两个字符串里的字符种类及个数不一样，则返回false */
+		std::vector<int> record(26, 0);
+		for (auto it = first1; it != last1; ++it) record[*it - 'a']++;
+		for (auto it = first2; it != last2; ++it) record[*it - 'a']--;
+		for (int i = 0; i < record.size(); ++i){
+			if (record[i] != 0) return false;
+		}
+
+		for (int i = 1; i < len; ++i){
+			if ((isScramble(first1, first1 + i, first2) && isScramble(first1 + i, last1, first2 + i)
+				|| (isScramble(first1 + i, last1, first2) && isScramble(first1, first1 + i, last2 - i)))){
+				return true;
+			}
+		}
+		return false;
+	}
+};
+3.时间：O（）；空间：O（N）	->递归+备忘录（map）
+class Solution {
+	typedef std::string::iterator Iterator;
+public:
+	bool isScramble(string s1, string s2) {
+		if (s1.size() != s2.size()) return false;
+		return getOrUpdate(s1.begin(), s1.end(), s2.begin());
+	}
+private:
+	bool isScramble(Iterator first1, Iterator last1, Iterator first2){
+		int len = std::distance(first1, last1);
+		auto last2 = std::next(first2, len);
+		/* 递归结束条件，仅剩一个字符 */
+		if (len == 1) return *first1 == *first2;
+		for (int i = 1; i < len; ++i){
+			if ( ( getOrUpdate(first1, first1 + i, first2) && getOrUpdate(first1 + i, last1, first2 + i) )
+				|| ( getOrUpdate(first1, first1 + i, last2 - i) && getOrUpdate(first1 + i, last1, first2) ) ){
+				return true;
+			}
+		}
+		return false;
+	}
+	bool getOrUpdate(Iterator first1, Iterator last1, Iterator first2){
+		/*auto key = std::tuple<Iterator, Iterator, Iterator>(first1, last1, first2);*/
+		auto key = std::make_tuple(first1, last1, first2);
+		auto pos = cache.find(key);
+		return (pos != cache.end() ? pos->second : (cache[key] = isScramble(first1, last1, first2)));
+	}
+private:
+	std::map<std::tuple<Iterator, Iterator, Iterator>, bool> cache;
+};
+4.时间：O（）；空间：O（N）	->递归，备忘录（hashmap）
+typedef std::string::iterator Iterator;
+typedef std::tuple<Iterator, Iterator, Iterator> Key;
+
+namespace std{
+	template<> struct hash<Key>{
+		size_t operator()(const Key& key) const{
+			Iterator first1, last1, first2;
+			std::tie(first1, last1, first2) = key;
+			int result = *first1;
+			result = result * 31 + *std::prev(last1);
+			result = result * 31 + *first2;
+			result = result * 31 + *std::next(first2, std::distance(first1, last1) - 1);
+			return result;
+		}
+	};
+};
+
+class Solution {
+public:
+	bool isScramble(string s1, string s2) {
+		if (s1.size() != s2.size()) return false;
+		return getOrUpdate(s1.begin(), s1.end(), s2.begin());
+	}
+private:
+	bool isScramble(Iterator first1, Iterator last1, Iterator first2){
+		int len = std::distance(first1, last1);
+		auto last2 = std::next(first2, len);
+		/* 递归结束条件 */
+		if (len == 1) return *first1 == *first2;
+
+		for (int i = 1; i < len; ++i){
+			if ((getOrUpdate(first1, first1 + i, first2) && getOrUpdate(first1 + i, last1, first2 + i))
+				|| (getOrUpdate(first1, first1 + i, last2 - i) && getOrUpdate(first1 + i, last1, first2))){
+				return true;
+			}
+		}
+		return false;
+	}
+	bool getOrUpdate(Iterator first1, Iterator last1, Iterator first2){
+		auto key = std::make_tuple(first1, last1, first2);
+		auto pos = cache.find(key);
+		return (pos != cache.end() ? pos->second : (cache[key] = isScramble(first1, last1, first2)));
+	}
+private:
+	std::unordered_map<Key, bool> cache;
+};
+5.时间：O（）；空间：O（N^3）	->动态规划
+class Solution {
+	/* 可以用记忆化搜索，必然可以用DP.设状态为f[n][i][j]，表示长度为n，
+		起点为s[i]和起点为s[j]两个字符串是否互为scramble，则状态转移方程为：
+		f[k][i][j] = （f[k][i][j] && f[n-k][i+k][j+k]）|| （f[k][i][j+n-k] && f[n-k][i+k][j]）
+	*/
+public:
+	bool isScramble(string s1, string s2) {
+		if (s1.size() != s2.size()) return false;
+		const int N = s1.size();
+		std::vector<std::vector<std::vector<bool>>> dp(N + 1,
+			std::vector<std::vector<bool>>(N, std::vector<bool >(N, false)));
+		/* 初始化边界条件，长度为1 */
+		for (int i = 0; i < N; ++i){
+			for (int k = 0; k < N; ++k){
+				dp[1][i][k] = s1[i] == s2[k];
+			}
+		}
+
+		for (int len = 1; len <= N; ++len){
+			for (int i = 0; i + len <= N; ++i){
+				for (int j = 0; j + len <= N; ++j){
+					for (int k = 1; k < len; ++k){
+						if ((dp[k][i][j] && dp[len - k][i + k][j + k])
+							|| (dp[k][i][j + len - k] && dp[len - k][i + k][j])){
+							dp[len][i][j] = true;
+						}
+					}
+				}
+			}
+		}
+
+		return dp[N][0][0];
+	}
+};

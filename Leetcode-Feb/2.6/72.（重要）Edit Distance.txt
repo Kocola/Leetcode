@@ -1,0 +1,56 @@
+1.时间：O（N*M）；空间：O（N*M）	->动态规划
+class Solution {
+public:
+	int minDistance(string word1, string word2) {
+		if (word1.size() == 0) return word2.size();
+		if (word2.size() == 0) return word1.size();
+		std::vector<std::vector<int>> dp(word1.size() + 1, std::vector<int>(word2.size() + 1, std::numeric_limits<int>::max()));
+		/* 初始化dp边界 */
+		for (int i = 0; i <= word2.size(); ++i){
+			dp[0][i] = i;
+		}
+		for (int i = 0; i <= word1.size(); ++i){
+			dp[i][0] = i;
+		}
+
+		for (int i = 1; i <= word1.size(); ++i){
+			for (int k = 1; k <= word2.size(); ++k){
+				if (word1[i - 1] == word2[k - 1]){
+					dp[i][k] = dp[i - 1][k - 1];
+				} else{
+					dp[i][k] = std::min(dp[i - 1][k - 1], std::min(dp[i - 1][k], dp[i][k - 1])) + 1;
+				}
+			}
+		}
+		return dp[word1.size()][word2.size()];
+	}
+};
+2.时间：O（M*N）；空间：O（M）	->动态规划+滚动数组
+class Solution {
+public:
+	int minDistance(string word1, string word2) {
+		if (word1.size() == 0) return word2.size();
+		if (word2.size() == 0) return word1.size();
+		std::vector<int> dp(word2.size() + 1, std::numeric_limits<int>::max());
+		/* 初始化dp */
+		for (int i = 0; i <= word2.size(); ++i){
+			dp[i] = i;
+		}
+
+		int upper_left = dp[0];	//额外一个变量记录dp[i-1][k-1]
+		for (int i = 1; i <= word1.size(); ++i){
+			upper_left = dp[0];	//记录dp[i-1][0]
+			dp[0] = i;
+			for (int k = 1; k <= word2.size(); ++k){
+				int upper = dp[k];	//记录dp[i][k]
+				if (word1[i - 1] == word2[k - 1]){
+					dp[k] = upper_left;
+				} else{
+					dp[k] = std::min(upper_left, std::min(dp[k], dp[k-1])) + 1;
+				}
+				upper_left = upper;
+			}
+		}
+		return dp[word2.size()];
+	}
+};

@@ -1,0 +1,134 @@
+1.时间：O（N^2）;空间：O（N）	->动态规划
+/* 设状态dp[i][j]，表示从（i，j）到达终点的最小路径和，则状态转移方程为：
+    dp[i][j] = min(dp[i][j+1], dp[i+1][j]) + (i,j) */ 
+class Solution {
+public:
+	int minPathSum(vector<vector<int>>& grid) {
+		if (grid.size() == 0 || grid.front().size() == 0) return 0;
+		const int rows = grid.size(), cols = grid.front().size();
+		std::vector<int> dp(cols, 0);
+		/* 初始化dp*/
+		dp[cols - 1] = grid[rows - 1][cols - 1];
+		for (int i = cols - 2; i >= 0; --i){
+			dp[i] = grid[rows-1][i] + dp[i + 1];
+		}
+
+		for (int i = rows - 2; i >= 0; --i){
+			/* 最后一个元素更新 */
+			dp[cols - 1] = dp[cols - 1] + grid[i][cols - 1];
+			for (int k = cols - 2; k >= 0; --k){
+				dp[k] = std::min(dp[k + 1], dp[k]) + grid[i][k];
+			}
+		}
+		return dp[0];
+	}
+};
+2.时间：O（）；空间：O（N）	->递归，超时
+class Solution {
+public:
+	int minPathSum(vector<vector<int>>& grid) {
+		if (grid.size() == 0 || grid.front().size() == 0) return 0;
+		return minPathSum(grid, 0, 0);
+	}
+private:
+	int minPathSum(const std::vector<std::vector<int>>& grid, int row, int col){
+		const int rows = grid.size();
+		const int cols = grid.front().size();
+		/* 递归结束条件 */
+		if ((row == rows - 1) && (col == cols - 1)) return grid[row][col];
+
+		/* 前进的两个方向 */
+		std::vector<std::pair<int, int>> directions{ { row + 1, col }, { row, col + 1 } };
+		int result = std::numeric_limits<int>::max();
+		for (int i = 0; i < directions.size(); ++i){
+			int nextRow = directions[i].first, nextCol = directions[i].second;
+			if (isvalid(grid, nextRow, nextCol)){
+				result = std::min(result, grid[row][col] + minPathSum(grid, nextRow, nextCol));
+			}
+		}
+		return result;
+	}
+
+	bool isvalid(const std::vector<std::vector<int>>& grid, int row, int col){
+		return (row >= 0 && row < grid.size()) && (col >= 0 && col < grid.front().size());
+	}
+};
+3.时间：O（）；空间：O（N） ->递归+备忘录（VS编译通过，Leetcode编译不通过）
+typedef std::pair<int, int> Key;
+
+namespace std{
+	template<> struct hash<Key>{
+		size_t operator()(const Key& key){
+			return key.first * 31 + key.second;
+		}
+	};
+};
+
+class Solution {
+public:
+	int minPathSum(vector<vector<int>>& grid) {
+		if (grid.size() == 0 || grid.front().size() == 0) return 0;
+		return getOrUpdate(grid, 0, 0);
+	}
+private:
+	int minPathSum(const std::vector<std::vector<int>>& grid, int row, int col){
+		const int rows = grid.size();
+		const int cols = grid.front().size();
+		/* 递归结束条件，到达终点 */
+		if ((row == rows - 1) && (col == cols - 1)) return grid[row][col];
+
+		std::vector<std::pair<int, int>> directions{ { row + 1, col }, { row, col + 1 } };
+		int result = std::numeric_limits<int>::max();
+		for (int i = 0; i < directions.size(); ++i){
+			int nextRow = directions[i].first, nextCol = directions[i].second;
+			if (isvalid(grid, nextRow, nextCol)){
+				result = std::min(result, grid[row][col] + getOrUpdate(grid, nextRow, nextCol));
+			}
+		}
+		return result;
+	}
+
+	int getOrUpdate(const std::vector<std::vector<int>>& grid, int row, int col){
+		auto key = Key(row, col);
+		auto pos = cache.find(key);
+		return (pos != cache.end()) ? pos->second : (cache[key] = minPathSum(grid, row, col));
+	}
+
+	bool isvalid(const std::vector<std::vector<int>>& grid, int row, int col){
+		return (row >= 0 && row < grid.size()) && (col >= 0 && col < grid.front().size());
+	}
+private:
+	std::unordered_map<Key, int> cache;
+};
+4.时间：O（）；空间：O（N） ->递归+备忘录
+class Solution {
+	typedef std::pair<int, int> Key;
+public:
+	int minPathSum(vector<vector<int>>& grid) {
+		if (grid.size() == 0 || grid.front().size() == 0) return 0;
+		std::vector<std::vector<int>> cache(grid.size(), std::vector<int>(grid.front().size(), std::numeric_limits<int>::max()));
+		return minPathSum(grid, cache, 0, 0);
+	}
+private:
+	int minPathSum(const std::vector<std::vector<int>>& grid, std::vector<std::vector<int>>& cache, int row, int col){
+		const int rows = grid.size();
+		const int cols = grid.front().size();
+		/* 递归结束条件，到达终点 */
+		if ((row == rows - 1) && (col == cols - 1)) return grid[row][col];
+
+		std::vector<std::pair<int, int>> directions{ { row + 1, col }, { row, col + 1 } };
+		int result = std::numeric_limits<int>::max();
+		for (int i = 0; i < directions.size(); ++i){
+			int nextRow = directions[i].first, nextCol = directions[i].second;
+			if (isvalid(grid, nextRow, nextCol)){
+				result = std::min(result, grid[row][col] + 
+					(cache[nextRow][nextCol] != std::numeric_limits<int>::max() ? cache[nextRow][nextCol] : (cache[nextRow][nextCol] = minPathSum(grid, cache, nextRow, nextCol))));
+			}
+		}
+		return result;
+	}
+
+	bool isvalid(const std::vector<std::vector<int>>& grid, int row, int col){
+		return (row >= 0 && row < grid.size()) && (col >= 0 && col < grid.front().size());
+	}
+};

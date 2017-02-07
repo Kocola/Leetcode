@@ -1,0 +1,56 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        if (numRows == 1) return s;
+        std::string ret;
+	    for (int i = 0; i < numRows; ++i){
+		    int index = i, count = 0;
+		    while (index < s.size()){
+			    if (i == 0 || i == numRows - 1){
+				    ret.push_back(s[index]);
+			    	index += 2 * numRows - 2;
+			    }else{
+				    ret.push_back(s[index]);
+				    if (count & 0x01){
+				    	index = index + 2 * i;
+			    	}else{
+				    	index = index + 2 * numRows - 2 - 2 * i;
+				    }
+				    count = count + 1;
+		    	}
+	    	}
+    	}
+	    return ret;
+    }
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	string convert(string s, int numRows) {
+		if (numRows < 1) return "";
+		if (numRows == 1) return s;
+
+		std::string result;
+		for (int i = 0; i < numRows; ++i){
+			int curIndex = i;
+			if (i == 0 || i == numRows - 1){
+				const int interval = 2 * (numRows - 1);
+				while (curIndex < s.size()){
+					result.push_back(s[curIndex]);
+					curIndex += interval;
+				}
+			}else{
+				bool isEven = true;
+				while (curIndex < s.size()){
+					const int interval = isEven ? (numRows - i - 1) * 2 : i * 2;
+					result.push_back(s[curIndex]);
+					curIndex += interval;
+					isEven = !isEven;
+				}
+			}
+		}
+
+		return result;
+	}
+};

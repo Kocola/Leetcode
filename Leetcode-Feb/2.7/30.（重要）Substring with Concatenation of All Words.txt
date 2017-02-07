@@ -1,0 +1,29 @@
+1.时间：O（M*N）；空间：O（N）	->边界条件
+class Solution {
+public:
+	vector<int> findSubstring(string s, vector<string>& words) {
+		if (words.empty() || s.empty()) return std::vector<int>();
+
+		const int wordLen = words.front().size();
+		const int catLen = wordLen * words.size();
+
+		if (catLen > s.size()) return std::vector<int>(); // 如果连接的字符串比s还大，肯定错误
+
+		std::unordered_map<std::string, int> dict;
+		for (auto word : words) dict[word]++;
+
+		std::vector<int> result;
+
+		for (auto i = s.begin(); i <= std::prev(s.end(), catLen); ++i){
+			auto unused = dict;
+			for (auto k = i; k != std::next(i, catLen); k += wordLen){
+				auto pos = unused.find(s.substr(std::distance(s.begin(), k), wordLen));
+				if (pos == unused.end() || pos->second == 0) break;
+				if (--pos->second == 0) unused.erase(pos);
+			}
+			if (unused.empty()) result.push_back(std::distance(s.begin(), i));
+		}
+
+		return result;
+	}
+};

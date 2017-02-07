@@ -1,0 +1,88 @@
+1.时间：O（N/M）;空间：O（1）	->超时
+class Solution {
+	typedef long long int64_t;
+public:
+	int divide(int dividend, int divisor) {
+		if (divisor == 0) return std::numeric_limits<int>::max();
+
+		int64_t _dividend = dividend, _divisor = divisor;
+
+		bool is_result_negative = (_dividend > 0 && _divisor < 0)
+			|| (_dividend < 0 && _divisor > 0);
+
+		_dividend = std::abs(_dividend);
+		_divisor = std::abs(_divisor);
+
+		int64_t result = 0;
+		while (_dividend >= _divisor){
+			_dividend -= _divisor;
+			result += 1;
+		}
+
+		result = is_result_negative ? -1*result : result;
+		if (result > std::numeric_limits<int>::max()) return std::numeric_limits<int>::max();
+		return result;
+	}
+};
+2.时间：O（）；空间：O（1）	-> 加速
+class Solution {
+	typedef long long int64_t;
+public:
+	int divide(int dividend, int divisor) {
+		const int upper = std::numeric_limits<int>::max();
+		if (divisor == 0) return upper;
+
+		bool is_result_negative = (dividend > 0 && divisor < 0)
+			|| (dividend < 0 && divisor > 0);
+
+		int64_t _dividend = std::abs((int64_t)dividend);
+		int64_t _divisor = std::abs((int64_t)divisor);
+
+		int64_t result = 0;
+		while (_dividend >= _divisor){
+			/*_dividend -= _divisor;
+			result += 1;*/
+			int64_t times = divisor;
+			for (int i = 0; _dividend >= times && (times < upper >> 1); ++i, times <<= 1){ /* (times < upper >> 1)防止溢出 */
+				_dividend -= times;
+				result += 1 << i;
+			}
+		}
+
+		result = is_result_negative ? -1 * result : result;
+		if (result > upper) upper;
+		return result;
+	}
+};
+3.时间：O（）；空间：O（1）	->不使用long long
+class Solution {
+	typedef unsigned int uint;
+public:
+	int divide(int dividend, int divisor) {
+		const int Upper = std::numeric_limits<int>::max();
+		if (divisor == 0) return Upper;
+
+		/* 当dividend=INT_MIN时，-dividend会溢出，所以用unsigned int */
+		uint _dividend = dividend >= 0 ? dividend : -dividend;	/* -(-2147483648) = 2147483648，溢出，变成-2147483648 */
+		uint _divisor = divisor >= 0 ? divisor : -divisor;
+
+		bool is_result_negative = (dividend ^ divisor) >> 31;
+
+		int result = 0;
+		while (_dividend >= _divisor){
+			uint times = _divisor;
+			uint multi = 1;
+			if (!is_result_negative && result == Upper) return Upper;	/* 数据例子：[-2147483648. -1], [-2147483648, 1] */
+			while (_dividend >= times){
+				_dividend -= times;
+				result += multi;
+				if (times < (Upper >> 1)){	//防止溢出
+					times <<= 1;
+					multi <<= 1;
+				}
+			}
+		}
+
+		return is_result_negative ? -result : result;
+	}
+};

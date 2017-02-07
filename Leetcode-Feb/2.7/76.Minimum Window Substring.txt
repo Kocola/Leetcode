@@ -1,0 +1,40 @@
+1.时间：O（）；空间：O（N）
+class Solution {
+public:
+	string minWindow(string s, string t) {
+		if (s.empty() || s.size() < t.size()) return "";
+		std::vector<int> needed(128, 0);	//记录所需的各个字符个数
+		std::vector<int> appeared(128, 0);	//记录已出现的各个字符个数
+		/* 初始化needed */
+		for (auto ch : t){
+			needed[ch - '\0']++;
+		}
+		int win_start = 0, win_end = 0;
+		int min_win_len = std::numeric_limits<int>::max(), min_start = 0;
+		int count = 0; //记录已找到t中的字符的个数
+		for (; win_end != s.size(); ++win_end){
+			int hashIndex = s[win_end] - '\0';
+			appeared[hashIndex]++;
+			if (needed[hashIndex] > 0 && appeared[hashIndex] <= needed[hashIndex]){
+				count++;
+			}
+			/* t中的字符已经全部找到，计算最小窗口大小 */
+			if (count == t.size()){
+				while (win_start <= win_end){
+					int index = s[win_start] - '\0';
+					if (needed[index] == 0 || appeared[index] > needed[index]){
+						appeared[index]--;
+					}else{
+						break;	//表示不能继续缩小
+					}
+					win_start++;
+				}
+				if (min_win_len > (win_end - win_start + 1)){
+					min_win_len = win_end - win_start + 1;
+					min_start = win_start;
+				}
+			}
+		}
+		return min_win_len != std::numeric_limits<int>::max() ? s.substr(min_start, min_win_len) : "";
+	}
+};

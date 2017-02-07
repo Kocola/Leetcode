@@ -1,0 +1,33 @@
+1.时间：O（N^2）；2.空间：O（N）；
+class Solution {
+public:
+	vector<int> getRow(int rowIndex) {
+		//if (rowIndex < 0) return std::vector<int>();
+		if (rowIndex <= 0) return std::vector<int>{1};
+		std::vector<int> result(rowIndex + 1, 1);
+		for (int row = 1; row <= rowIndex; ++row){
+			int upper_left = result[0];
+			for (int col = 1; col < row; ++col){
+				int upper = result[col];
+				result[col] = result[col] + upper_left;
+				upper_left = upper;
+			}
+		}
+		return result;
+	}
+};
+2.时间：O（N^2）；2.空间：O（N）	->不使用upper_left
+class Solution {
+public:
+	vector<int> getRow(int rowIndex) {
+		if (rowIndex < 0) return std::vector<int>();
+		if (rowIndex == 0) return std::vector<int>{1};
+		std::vector<int> result(rowIndex + 1, 1);
+		for (int row = 1; row <= rowIndex; ++row){
+			for (int col = row - 1; col > 0; --col){
+				result[col] += result[col - 1];
+			}
+		}
+		return result;
+	}
+};

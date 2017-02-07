@@ -1,0 +1,187 @@
+1.时间：O（N^3）;空间：O（1）	->以边为中心
+class Solution {
+	typedef long long int64_t;
+public:
+	int maxPoints(vector<Point>& points) {
+		/* 点数小于3时，直接返回点的数量 */
+		if (points.size() < 3) return points.size();
+
+		int max_count = 0;
+		for (int i = 0; i < points.size(); ++i){
+			for (int j = i + 1; j < points.size(); ++j){
+				int cur_count = 0;
+				for (int k = 0; k < points.size(); ++k){
+					if (isCollinear(points[i], points[j], points[k])){
+						cur_count++;
+					}
+				}
+				max_count = std::max(max_count, cur_count);
+			}
+		}
+
+		return max_count;
+	}
+private:
+	/* 判断三个点是否共线，叉乘 */
+	bool isCollinear(const Point& a, const Point& b, const Point& c){
+		//if (a.x == b.x && a.y == b.y) return false;	/* 如果a和b是同一个点，会导致判断所有点共线 */
+		if (a.x == b.x && a.y == b.y){
+			if (a.x == c.x && a.y == c.y) return true;	/* a，b，c三点共线 */
+			return false; /* 如果a和b是同一个点，会导致判断所有点共线 */
+		}
+		//bool result = (int64_t)(b.x - a.x) * (int64_t)(c.y - a.y) == (int64_t)(c.x - a.x) * (int64_t)(b.y - a.y);
+		return (int64_t)(b.x - a.x) * (int64_t)(c.y - a.y) == (int64_t)(c.x - a.x) * (int64_t)(b.y - a.y);
+	}
+	/* 精度问题，数据例子：[[0,0],[94911151,94911150],[94911152,94911151]] */
+	bool isCollinear(const Point& a, const Point& b, const Point& c){
+		if (a.x == b.x && a.x == c.x) return true;	//垂直
+		if ((a.x == c.x && a.y == c.y) || (b.x == c.x && b.y == c.y)) return true;	//ac共点或者bc共点
+		if (a.x == b.x || a.x == c.x || b.x == c.x) return false;
+		return std::abs(((double)(c.y - a.y) / (c.x - a.x)) - (double(b.y - a.y) / (b.x - a.x))) == 0;
+	}
+};
+2.时间：O（N^2）;空间：O（N）	->以点为中心
+class Solution {
+	typedef long long int64_t;
+public:
+	int maxPoints(vector<Point>& points) {
+		/* 点数小于3时，直接返回点的数量 */
+		if (points.size() < 3) return points.size();
+
+		std::unordered_map<double, int> slope_count;
+		int result = 0;
+		for (int i = 0; i < points.size(); ++i){
+			slope_count.clear();
+			int point_max = 0, same_point = 0;
+			for (int k = i + 1; k < points.size(); ++k){
+				double slope = 0;
+				if (points[i].x == points[k].x){	//垂直
+					slope = std::numeric_limits<double>::infinity();
+					if (points[i].y == points[k].y){ //共点
+						same_point++;	
+						continue;
+					}
+				} else{
+					/* 精度问题，数据例子：[[0,0],[94911151,94911150],[94911152,94911151]] */ 
+					slope = (points[i].y - points[k].y) / (points[i].x - points[k].x);
+				}
+
+				int count = 0;
+				if (slope_count.find(slope) != slope_count.end())
+					count = ++slope_count[slope];
+				else{
+					slope_count[slope] = 2;
+					count = 2;
+				}
+				point_max = std::max(point_max, count);
+			}
+			result = std::max(result, point_max + same_point);
+		}
+		return result;
+	}
+};
+3.时间：O（N^2）;空间：O（N）	->以点为中心（VS编译通过，leetcode不通过）
+struct Slope{
+	int deltaX, deltaY;
+	bool operator==(const Slope& rhs) const {
+		return this->deltaX == rhs.deltaX && this->deltaY == rhs.deltaY;
+	}
+	Slope(int deltaX, int deltaY) : deltaX(deltaX), deltaY(deltaY){}
+};
+
+namespace std{
+	template<> struct hash<Slope>{
+		size_t operator()(const Slope& key) {
+			return key.deltaX * 31 + key.deltaY;
+		}
+	};
+};
+
+class Solution {
+public:
+	int maxPoints(vector<Point>& points) {
+		/* 点数小于3时，直接返回点的数量 */
+		if (points.size() < 3) return points.size();
+
+		std::unordered_map<Slope, int> slope_count;
+		int result = 0;
+		for (int i = 0; i < points.size(); ++i){
+			slope_count.clear();
+			int point_max = 1, same_point = 0;
+			for (int k = i + 1; k < points.size(); ++k){
+				Slope slope = Slope(0, 0);
+				if (points[i].x == points[k].x && points[i].y == points[k].y){ //共点
+					same_point++;	
+					continue;
+				} else{
+					int deltaX = points[i].x - points[k].x;
+					int deltaY = points[i].y - points[k].y;
+					int gcd = calcGCD(deltaX, deltaY);
+					slope = Slope(deltaX / gcd, deltaY / gcd);
+				}
+
+				int count = 0;
+				if (slope_count.find(slope) != slope_count.end())
+					count = ++slope_count[slope];
+				else{
+					slope_count[slope] = 2;
+					count = 2;
+				}
+				point_max = std::max(point_max, count);
+			}
+			result = std::max(result, point_max + same_point);
+		}
+		return result;
+	}
+private:
+	/* 求最大公约数 */
+	int calcGCD(int x, int y){
+		return y != 0 ? calcGCD(y, x % y) : x;
+	}
+};
+4.时间：O（N^2LOGN）;空间：O（N）	->以点为中心
+typedef std::pair<int, int> Slope;
+
+class Solution {
+public:
+	int maxPoints(vector<Point>& points) {
+		/* 点数小于3时，直接返回点的数量 */
+		if (points.size() < 3) return points.size();
+
+		std::map<Slope, int> slope_count;
+		int result = 0;
+		for (int i = 0; i < points.size(); ++i){
+			slope_count.clear();
+			int point_max = 1, same_point = 0;	/* point_max = 1全部共点时，same_point = 全部点数 - 1，此时要返回正确，需初始化point_max = 1 */
+			for (int k = i + 1; k < points.size(); ++k){
+				Slope slope = Slope(0, 0);
+				if (points[i].x == points[k].x && points[i].y == points[k].y){ //共点
+					same_point++;
+					continue;
+				}
+				else{
+					int deltaX = points[i].x - points[k].x;
+					int deltaY = points[i].y - points[k].y;
+					int gcd = calcGCD(deltaX, deltaY);
+					slope = Slope(deltaX / gcd, deltaY / gcd);
+				}
+
+				int count = 0;
+				if (slope_count.find(slope) != slope_count.end())
+					count = ++slope_count[slope];
+				else{
+					slope_count[slope] = 2;
+					count = 2;
+				}
+				point_max = std::max(point_max, count);
+			}
+			result = std::max(result, point_max + same_point);
+		}
+		return result;
+	}
+private:
+	/* 求最大公约数 */
+	int calcGCD(int x, int y){
+		return y != 0 ? calcGCD(y, x % y) : x;
+	}
+};

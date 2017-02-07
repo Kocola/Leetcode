@@ -1,0 +1,45 @@
+1.时间：O（N）；空间：O（）
+class Solution {
+public:
+	vector<string> fullJustify(vector<string>& words, int maxWidth) {
+		if (words.size() == 0) return std::vector<std::string>();
+
+		std::vector<std::string> result;
+		int wordsNum = words.size();
+		int len = 0, line_start = 0;	//记录当前行字符串长度和第一个字符串在words里的下标
+
+		for (int i = 0; i < wordsNum; ++i){
+			if ((len + words[i].size() + (i - line_start)) > maxWidth){	//加入当前字符会超过一行长度
+				result.push_back(connect(words, line_start, i - 1, len, maxWidth, false));
+				len = 0;
+				line_start = i;	
+			}
+			len += words[i].size();
+		}
+
+		/* 最后一行的处理 */
+		result.push_back(connect(words, line_start, wordsNum - 1, len, maxWidth, true));
+
+		return result;
+	}
+private:
+	/* 连接一行的字符串 */
+	std::string connect(std::vector<std::string>& words, int start, int end, int strsLen, int maxWidth, bool isLast){
+		std::string result;
+		int lineWordsNum = end - start + 1;
+		for (int i = 0; i < lineWordsNum; ++i){
+			result += words[start + i];
+			addSpaces(result, i, lineWordsNum - 1, maxWidth - strsLen, isLast);	/* 最后一行只用左对齐，不需要右对齐 */
+		}
+
+		/* 如果还未填充完，则填充空格 */
+		if (result.size() < maxWidth) result.append(maxWidth - result.size(), ' ');
+		return result;
+	}
+	/* 添加空格 */
+	void addSpaces(std::string& str, int order, int intervalNum, int spacesNum, bool isLast){
+		if (intervalNum < 1 || order > intervalNum - 1) return;
+		int spaces = isLast ? 1 : (spacesNum / intervalNum + (order < spacesNum % intervalNum ? 1 : 0));
+		str.append(spaces, ' ');
+	}
+};

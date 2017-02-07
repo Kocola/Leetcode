@@ -1,0 +1,50 @@
+1.时间：O（N）；空间：O（1）	->没有额外空间，但删除，插入操作耗时
+class Solution {
+public:
+	vector<Interval> insert(vector<Interval>& intervals, Interval newInterval) {
+		if (intervals.size() == 0) return std::vector<Interval>{newInterval};
+		for (auto it = intervals.begin(); it != intervals.end();){
+			if (it->start > newInterval.end){
+				intervals.insert(it, newInterval);
+				return intervals;
+			} else if (it->end < newInterval.start){
+				it++;
+				continue;
+			} else{
+				newInterval.start = std::min(newInterval.start, it->start);
+				newInterval.end = std::max(newInterval.end, it->end);
+				//intervals.erase(it, it + 1);
+				it = intervals.erase(it);
+			}
+		}
+		intervals.insert(intervals.end(), newInterval);
+		return intervals;
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	vector<Interval> insert(vector<Interval>& intervals, Interval newInterval) {
+		if (intervals.size() == 0) std::vector<Interval>{newInterval};
+		std::vector<Interval> result;
+		std::vector<Interval>::iterator it = intervals.begin();
+		/* 合并，将在newInterval前的段放入result */
+		while (it != intervals.end()){
+			if (it->start > newInterval.end) break;
+			else if(it->end < newInterval.start){
+				result.push_back(*it);
+			}else{
+				newInterval.start = std::min(newInterval.start, it->start);
+				newInterval.end = std::max(newInterval.end, it->end);
+			}
+			++it;
+		}
+		/* 将newInterval放入result */
+		result.push_back(newInterval);
+		/* 将intervals中大于newInterval的段放入result */
+		while (it != intervals.end()){
+			result.push_back(*it++);
+		}
+		return result;
+	}
+};

@@ -1,0 +1,36 @@
+1.时间：O（N^2）;空间：O（N）
+class Solution {
+public:
+	vector<int> spiralOrder(vector<vector<int>>& matrix) {
+		if (matrix.size() == 0 || matrix.front().size() == 0) return std::vector<int>();
+
+		int beginX = 0, endX = matrix.size() - 1;
+		int beginY = 0, endY = matrix.front().size() - 1;
+
+		std::vector<int> result;
+
+		while(beginX <= endX && beginY <= endY){	//可以输出的条件
+			/* 左->右 */
+			for (int col = beginY; col <= endY; ++col)
+				result.push_back(matrix[beginX][col]);
+			/* 上->下 */
+			for (int row = beginX + 1; row <= endX; ++row)
+				result.push_back(matrix[row][endY]);
+			/* 右->左 */
+			if (beginX >= endX) break;	//避免同行重复输出
+			for (int col = endY - 1; col >= beginY; --col)
+				result.push_back(matrix[endX][col]);
+			/* 下->上 */
+			if (beginY >= endY) break;	//避免同列重复输出
+			for (int row = endX - 1; row > beginX; --row)
+				result.push_back(matrix[row][beginY]);
+
+			beginX++;
+			beginY++;
+			endX--;
+			endY--;
+		}
+
+		return result;
+	}
+};

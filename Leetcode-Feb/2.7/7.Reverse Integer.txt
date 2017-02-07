@@ -1,0 +1,48 @@
+1.时间：O（N）；空间：O（1）	->边界情况，超出int上界
+class Solution {
+public:
+    int reverse(int x) {
+        bool negative = false;
+        if(x < 0){
+            negative = true;
+            x = -x;
+        }
+        long long ret = 0;
+        while(x > 0){
+            ret = ret * 10 + x % 10;
+            x = x / 10;
+        }
+        if(ret > (std::numeric_limits<int>::max)())return 0;
+        if(negative) ret = ret * -1;
+        return ret;
+    }
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int reverse(int x) {
+		if (x == 0) return 0; 
+
+		bool is_negative = false;
+		is_valid = true;
+		const int Upper = std::numeric_limits<int>::max();
+		if (x < 0){
+			is_negative = true;
+			x = -x;
+		}
+		int result = 0;
+		while (x > 0){
+			int remain = x % 10;
+			if ((result > Upper / 10) || ( (result == Upper / 10) && (remain >= Upper % 10
+				|| (is_negative && remain >= (Upper % 10 + 1))))){
+				is_valid = false;
+				return 0;
+			}
+			result = result * 10 + remain;
+			x = x / 10;
+		}
+		return is_negative ? -1 * result : result;
+	}
+private:
+	bool is_valid;
+};

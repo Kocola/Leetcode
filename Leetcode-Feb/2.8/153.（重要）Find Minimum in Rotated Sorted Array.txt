@@ -1,0 +1,53 @@
+1.时间：O（LOGN）；空间：O（1）
+class Solution {
+public:
+	int findMin(vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+		int lower = 0, upper = nums.size() - 1;
+		while (lower < upper){
+			int mid = lower + ((upper - lower) >> 1);
+			if (nums[lower] < nums[upper]){
+				upper = mid;
+			} else{
+				lower++;	/* 如果是lowe = mid，会有数据超时，数据例子：[2,1]（[2,3,1]）;
+					    但是，也因为此，导致部分数据效率底下*/
+			}
+		}
+		return nums[lower];
+	}
+};
+2.时间：O（LOGN）；空间：O（1）
+class Solution {
+public:
+	int findMin(vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+		int lower = 0, upper = nums.size() - 1;
+		while (lower < upper){
+			int mid = lower + ((upper - lower) >> 1);
+			if (nums[lower] <= nums[upper]) return nums[lower]; /* [lower,upper]有序，那么nums[lower]肯定是最小值 */
+			else{ /* nums[lower] > nums[upper] */	/* 相比于1，在这个分支有优化 */
+				if (nums[mid] <= nums[upper]) lower++;	 /* nums[lower] > nums[upper]&& nums[mid] <= nums[upper] --> [mid, upper]有序，但是结果在[lower, mid]内
+								     数据例子：[5,6,7, 0 ,1,2,4]，[6,7,0, 1 ,2,4,5]，[7,0,1, 2 ,4,5,6] , 最小数的位置不定，这里采取lower++找到该数*/
+				else lower = mid + 1;	/* nums[lower]>nums[upper]&&nums[mid]>nums[upper] --> [lower,mid]有序，但是结果在[mid + 1, upper]内 */
+			}
+		}
+		return nums[lower];
+	}
+};
+3.时间：O（LOGN）；空间：O（1）
+class Solution {
+public:
+	int findMin(vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+		int lower = 0, upper = nums.size() - 1;
+		while (lower < upper && nums[lower] >= nums[upper]){
+			int mid = lower + ((upper - lower) >> 1);
+			if(nums[lower] > nums[lower+1]) return nums[lower+1];/* 变化不大 */
+			/* nums[lower] > nums[upper] */
+			/* lower += (mid - lower > 1) ? ((mid - lower) >> 1) : 1 会错误，数据例子：[9,1,2,3,4,5,6,7,8]返回2，答案1*/ 
+			if (nums[mid] <= nums[upper]) lower++;//lower += (mid - lower > 1) ? ((mid - lower) >> 1) : 1;
+			else lower = mid + 1;
+		}
+		return nums[lower];
+	}
+};

@@ -1,0 +1,23 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	int minSubArrayLen(int target, vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+
+		int win_start = 0, min_win_len = std::numeric_limits<int>::max();
+		int sum = 0;
+		for (int i = 0; i < nums.size(); ++i){
+			sum = sum + nums[i];
+			if (sum >= target){
+				while ((sum - nums[win_start]) >= target){
+					sum -= nums[win_start];
+					win_start++;
+				}
+				int cur_win_len = i - win_start + 1;
+				min_win_len = std::min(min_win_len, cur_win_len);
+			}
+		}
+
+		return min_win_len == std::numeric_limits<int>::max() ? 0 : min_win_len;
+	}
+};

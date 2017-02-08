@@ -1,0 +1,22 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+	typedef long long int64_t;
+public:
+	vector<int> twoSum(vector<int>& numbers, int target) {
+		if (numbers.size() < 2) return std::vector<int>();
+
+		std::vector<int> result;
+		int lower = 0, upper = numbers.size() - 1;
+		while (lower < upper){
+			int64_t sum = numbers[lower] + numbers[upper];
+			if (sum == target) break;
+			else if (sum < target) lower++;
+			else upper--;
+		}
+		result.push_back(lower+1);
+		result.push_back(upper+1);
+
+		return result;
+	}
+};
+2.

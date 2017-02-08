@@ -1,0 +1,59 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+	/*	默认限制条件：maxWidth <= max(words[i].size())，0<=i<n，n是words的大小
+	*/
+public:
+	vector<string> fullJustify(vector<string>& words, int maxWidth) {
+		if (words.size() == 0) return std::vector<std::string>();
+
+		std::vector<std::string> result;
+		int lineLen = 0, line_start = 0;	//当前行字符串长度，行首字符串在words中的下标
+		for (int i = 0; i < words.size(); ++i){
+			/* 当前行已有字符串长度 + 当前字符串字符串长度 + 空格数（计算当前行字符串数量获得） > 行最大长度
+			表示需要换行 */
+			if (lineLen + words[i].size() + (i - line_start) > maxWidth){
+				result.push_back(connect(words, line_start, i - 1, lineLen, maxWidth, false));
+				/* 变量重置 */
+				line_start = i;
+				lineLen = 0;
+			}
+			lineLen += words[i].size();
+		}
+		/* 上面for结束后，还有一行数据未处理，考虑边界数据：["this", 8] */
+		result.push_back(connect(words, line_start, words.size() - 1, lineLen, maxWidth, true));
+
+		return result;
+	}
+private:
+	/* 将words 下标区间[line_start，line_end]上的字符串按照要求连成一行 */
+	std::string connect(const std::vector<std::string>& words, int line_start, int line_end, int lineLen, int maxWidth, bool isLast){
+		std::string result;
+		int line_str_num = line_end - line_start + 1;
+
+		for (int i = 0; i < line_str_num; ++i){
+			result += words[line_start + i];
+			addSpaces(result, i, line_str_num - 1, maxWidth - lineLen, isLast);
+		}
+
+		/* 最后一行不是右对齐，上述处理后，可能无法补齐长度为maxWidth，因此需要额外填充空格 */
+		/*if (isLast){
+			result.append(maxWidth - result.size(), ' ');
+		}*/
+		/* 上行修改为下行，原因：addSpaces针对间隙添加空格，如果只有一行只有一个字符串，则没有间隙，这样会导致行无法填满 
+			，数据例子：[["to", "many"],6]*/
+		result.append(maxWidth - result.size(), ' ');
+
+		return result;
+	}
+
+	/* 在一行添加的字符串后面添加空格，间隙的定义是：两个字符串之间，如果只有一个字符串，则没有间隙
+	参数：行字符串，间隙下标（间隙下标 = 该字符串在当前行字符串中的下标），间隙数量（=当前行字符串数量-1），空格数量（=maxWidth - 当前行字符串的长度），是否是最后一行*/
+	/* 添加inline关键字后，随机由1.6%->48.3%，由次看出，函数调用对于小函数会消耗过多性能 */
+	inline void addSpaces(std::string& str, int intervalOrder, int intervalNum, int spaceNum, bool isLast){
+		/* 如果没有间隙，或者当前间隙下标不在[0, intervalNum-1]区间上（因为非最后一行右对齐，最后一个字符串末尾不需添加空格） */
+		if (intervalNum < 1 || intervalOrder > intervalNum - 1) return;
+		/* 计算空格数量，如果是最后一行，必须添加一个空格（因为上一行使得当前至少有一个空格） */
+		int spaces = isLast ? 1 : (spaceNum / intervalNum + (intervalOrder < spaceNum % intervalNum ? 1 : 0));
+		str.append(spaces, ' ');
+	}
+};

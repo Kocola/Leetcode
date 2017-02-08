@@ -1,0 +1,17 @@
+1.时间：O（LOGN）；空间：O（1）	->同153
+class Solution {
+public:
+	int findMin(vector<int>& nums) {
+		if (nums.size() == 0) return 0;
+		int lower = 0, upper = nums.size() - 1;
+		while (lower < upper && nums[lower] >= nums[upper]){
+			int mid = lower + ((upper - lower) >> 1);
+			if(nums[lower] > nums[lower+1]) return nums[lower+1];/* 变化不大 */
+			/* nums[lower] > nums[upper] */
+			/* lower += (mid - lower > 1) ? ((mid - lower) >> 1) : 1 会错误，数据例子：[9,1,2,3,4,5,6,7,8]返回2，答案1*/ 
+			if (nums[mid] <= nums[upper]) lower++;//lower += (mid - lower > 1) ? ((mid - lower) >> 1) : 1;
+			else lower = mid + 1;
+		}
+		return nums[lower];
+	}
+};

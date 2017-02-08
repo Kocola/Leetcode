@@ -1,0 +1,49 @@
+1.时间：O（N）；空间：O（1）	->比较次数2*N
+class Solution {
+public:
+	int findPeakElement(vector<int>& nums) {
+		if (nums.size() <= 1) return 0;
+		/* 判断首尾元素是否符合要求 */
+		if (nums[0] > nums[1]) return 0;
+		if (nums[nums.size() - 1] > nums[nums.size() - 2]) return nums.size() - 1;
+		/* 判断区间[1~nums.size() - 2]是否有peak */
+		for (int i = 1; i <= nums.size() - 2; ++i){
+			if (nums[i] > nums[i - 1] && nums[i] > nums[i + 1]) return i;
+		}
+		return -1;
+	}
+};
+2.时间：O（N）；空间：O（1）	->比较次数N
+/* 参考博客：http://blog.csdn.net/doc_sgl/article/details/41991809 */
+class Solution {
+	/* 按照题意，nums[0]是大于左边的不存在的那个元素，nums[size - 1]也是大于右边那个不存在的元素的，假设不存在
+		那就会有nums[0] < nums[1]，nums[1] < nums[2]，即递增，nums[size-2] < nums[size-1]，这样nums[size-1]即peak，
+		所以一定存在
+		于是有这样的思路，nums[-1] < nums[0]，我们假设左边的元素小于右边的元素，那么第一个左边的元素大于右边的那个一定
+		是peak */
+public:
+	int findPeakElement(vector<int>& nums) {
+		if (nums.size() <= 1) return 0;
+		for (int i = 1; i < nums.size(); ++i){
+			if (nums[i] < nums[i - 1])
+				return i - 1;
+		}
+		return nums.size() - 1;
+	}
+};
+3.时间：O（LOGN）；空间：O（1）
+class Solution {
+public:
+	int findPeakElement(vector<int>& nums) {
+		if (nums.size() <= 1) return 0;
+
+		int lower = 0, upper = nums.size() - 1;
+		while (lower < upper){
+			int mid = lower + ((upper - lower) >> 1);
+			if (nums[mid] > nums[mid + 1]) upper = mid;
+			else lower = mid + 1;
+		}
+		
+		return lower;
+	}
+};

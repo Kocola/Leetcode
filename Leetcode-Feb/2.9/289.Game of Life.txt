@@ -1,0 +1,45 @@
+1.时间：O（N）；空间：O（1）	->编码
+class Solution {
+	/* inplace，需要区别DEAD->DEAD，DEAD->LIVE，LIVE->DEAD，LIVE->LIVE四种状态，int足够编码这四种状态，
+		这里使用0，10，1，11来编码以上状态 对10求余可以获得上一次的状态（0：DEAD，1：LIVE）*/
+public:
+	void gameOfLife(vector<vector<int>>& board) {
+		if (board.empty() || board.front().empty()) return;
+		for (int i = 0; i < board.size(); ++i){
+			for (int k = 0; k < board.front().size(); ++k){
+				int liveCount = calcLiveNum(board, i, k);
+				int& cur_state = board[i][k];
+				/*if (cur_state == 0 && liveCount == 3) cur_state += 10;	//DEAD->LIVE（0->10）
+				else if (cur_state == 1 && (liveCount == 2 || liveCount == 3)) cur_state += 10;		//LIVE->LIVE（1->11）*/
+				if (cur_state == 0){
+					if (liveCount == 3) cur_state += 10;
+				}
+				else if (cur_state == 1){
+					if (liveCount == 2 || liveCount == 3) cur_state += 10;
+				}
+			}
+		}
+
+		/* 将编码过的state恢复成0，1形式 */
+		for (int i = 0; i < board.size(); ++i){
+			for (int k = 0; k < board.front().size(); ++k){
+				board[i][k] /= 10;
+			}
+		}
+	}
+private:
+	int calcLiveNum(const std::vector<std::vector<int>>& board, int row, int col){
+		const int rows = board.size();
+		const int cols = board.front().size();
+		int result = 0;
+		for (int dx = -1; dx <= 1; ++dx){
+			for (int dy = -1; dy <= 1; ++dy){
+				int nX = row + dx, nY = col + dy;
+				if (nX < 0 || nY < 0 || nX >= rows || nY >= cols || (nX == row && nY == col))
+					continue;
+				result += board[nX][nY] % 10 == 1 ? 1 : 0;
+			}
+		}
+		return result;
+	}
+};

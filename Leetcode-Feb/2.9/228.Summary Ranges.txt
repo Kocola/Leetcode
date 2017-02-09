@@ -1,0 +1,60 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	vector<string> summaryRanges(vector<int>& nums) {
+		if (nums.empty()) return std::vector<std::string>();
+
+		std::vector<std::string> result;
+		int lastIndex = 0;
+		std::stringstream range_str;
+		for (int i = 1; i < nums.size(); ++i){
+			if (nums[i] != nums[i - 1] + 1){
+				if (lastIndex == i - 1){
+					range_str << nums[lastIndex];
+				} else{
+					range_str << nums[lastIndex] << "->" << nums[(i - 1)];
+				}
+				lastIndex = i;
+				result.push_back(range_str.str());
+				range_str.str("");	/* 清空stringstream，用clear()函数只是清空状态 */ 
+			}
+		}
+		if (lastIndex == nums.size() - 1){
+			range_str << nums[lastIndex];
+		} else{
+			range_str << nums[lastIndex] << "->" << nums[(nums.size() - 1)];
+		}
+		result.push_back(range_str.str());
+
+		return result;
+	}
+};
+2.时间：O（N）；空间：O（N）	->相比于1，时间减少（std::stringstream过于耗费时间）
+class Solution {
+public:
+	vector<string> summaryRanges(vector<int>& nums) {
+		if (nums.empty()) return std::vector<std::string>();
+
+		std::vector<std::string> result;
+		int lastIndex = 0;
+		for (int i = 1; i < nums.size(); ++i){
+			if (nums[i] != nums[i - 1] + 1){
+				result.push_back(to_string(nums, lastIndex, i-1));
+				lastIndex = i;
+			}
+		}
+		result.push_back(to_string(nums, lastIndex, nums.size() - 1));
+
+		return result;
+	}
+private:
+	inline std::string to_string(const std::vector<int>& nums, int start, int end){/* 左闭右闭区间 */
+		char result[30];
+		if (start == end){
+			sprintf(result, "%d", nums[start]);
+		} else{
+			sprintf(result, "%d->%d", nums[start], nums[end]);
+		}
+		return std::string(result);
+	}
+};

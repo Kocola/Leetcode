@@ -1,0 +1,24 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨N£©	->DFS
+class Solution {
+public:
+	vector<vector<int>> combinationSum3(int k, int n) {
+		if (k == 0 || n < 1 || n > 45) return std::vector<std::vector<int>>();
+		std::vector<std::vector<int>> result;
+		std::vector<int> path;
+		dfs(result, path, 0, 1, k, n);
+		return result;
+	}
+private:
+	void dfs(std::vector<std::vector<int>>& result, std::vector<int>& path, int num_sum, int cur_num, int k, int target){
+		if (path.size() > k) return;
+		if (path.size() == k){
+			if (num_sum == target) result.push_back(path);
+			return;
+		}
+		for (int i = cur_num; i <= 9; ++i){
+			path.push_back(i);
+			dfs(result, path, num_sum + i, i + 1, k, target); 
+			path.pop_back();
+		}
+	}
+};

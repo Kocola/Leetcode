@@ -1,0 +1,17 @@
+1.时间：O（N）；空间：O（N）	->hash
+class Solution {
+public:
+	bool containsNearbyDuplicate(vector<int>& nums, int k) {
+		if (nums.size() <= 1 || k < 1) return false;
+		std::unordered_map<int, int> hashTable;
+		for (int i = 0; i < nums.size(); ++i){
+			if (hashTable.find(nums[i]) != hashTable.end()){
+				if (i - hashTable[nums[i]] <= k)  return true;
+				hashTable[nums[i]] = i;	//更新nums[i]的下标
+			} else{
+				hashTable[nums[i]] = i;
+			}
+		}
+		return false;
+	}
+};

@@ -1,0 +1,48 @@
+/* 参考博客：http://bookshadow.com/weblog/2015/09/28/leetcode-find-duplicate-number/ */
+1.时间：O（NLOGN）；空间：O（1）	->鸽笼原理
+class Solution {
+	/* 根据鸽笼原理，给定n+1个范围[1,n]的整数，其中一定存在数字出现至少两次，
+		假设枚举的数字为 n / 2
+		遍历数组，若数组中不大于n / 2的数字个数超过 n / 2，则可以确定[1, n / 2]范围内一定有解
+		否则，可以确定解在(n / 2, n]内*/
+public:
+	int findDuplicate(vector<int>& nums) {
+		if (nums.empty()) return 0;
+
+		/* nums.size() == n + 1, 中位数为：（1+n）/ 2 */
+		int lower = 1, upper = nums.size() - 1;
+		while (lower < upper){
+			int mid = lower + ((upper - lower) >> 1);
+			int count = std::count_if(nums.begin(), nums.end(), [&](const int num){
+				return num <= mid;
+			});
+			if (count <= mid) lower = mid + 1;
+			else upper = mid;
+		}
+
+		return lower;
+	}
+};
+2.时间：O（N）；空间：O（1）
+/* 类似于环状链表求入口结点一样，"龟兔"算法 */
+class Solution {
+public:
+	int findDuplicate(vector<int>& nums) {
+		if (nums.empty()) return 0;
+
+		/* 默认nums内没有>nums.size()的数 */
+		int slower = 0, faster = 0;
+		do{
+			slower = nums[slower];
+			faster = nums[nums[faster]];
+		} while (slower != faster);
+
+		int finder = 0;
+		do{
+			slower = nums[slower];
+			finder = nums[finder];
+		} while (slower != finder);
+
+		return finder;
+	}
+};

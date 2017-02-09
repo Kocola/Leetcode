@@ -1,0 +1,38 @@
+1.时间：O（N^2）;空间：O（1）
+class Solution {
+	/* 采用插入排序的思路 */
+public:
+	void moveZeroes(vector<int>& nums) {
+		if (nums.size() < 2) return;
+		for (int i = 1; i < nums.size(); ++i){
+			int cur_num = nums[i];
+			int k = i;
+			while (k > 0 && nums[k - 1] == 0){
+				nums[k] = nums[k - 1];
+				k--;
+			}
+			nums[k] = cur_num;
+		}
+	}
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+	/* 维持两个指针i，k，i表示当前遍历的位置，0~k存放的是非0 */
+public:
+	void moveZeroes(vector<int>& nums) {
+		if (nums.size() < 2) return;
+		
+		int notZeroIndex = 0;
+		for (int i = 0; i < nums.size(); ++i){
+			if (nums[i] != 0){	/* nums[i]不为0 */
+				if (i != notZeroIndex){	/* nums[i]!=0且notZeroIndex != i，说明此时notZeroCount位置是0，于是交换两个数，这里
+										由于nums[notZeroCount]为0的原因，所以不用std::swap（减少一次赋值操作）*/
+					nums[notZeroIndex] = nums[i];
+					nums[i] = 0;
+				} 
+				notZeroIndex++;
+			}
+		}
+
+	}
+};

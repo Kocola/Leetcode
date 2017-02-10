@@ -1,0 +1,107 @@
+1.Ê±¼ä£ºO£¨N^2£©;¿Õ¼ä£ºO£¨N^2£©
+
+class Solution{
+	typedef std::pair<int, int> Direction;
+public:
+	int calcVanishNum(std::vector<std::vector<char>>& board, int x1, int y1, int x2, int y2){
+		if (board.empty() || board.front().empty()) return 0;
+
+		const int rows = board.size();
+		const int cols = board.front().size();
+		visited = std::vector<std::vector<int>>(rows, std::vector<int>(cols, 0));
+		int result = 0;
+
+		std::swap(board[x1][y1], board[x2][y2]);
+		result += check(board, x1, y1);
+
+		for (int i = rows - 1; i >= 0; --i){
+			for (int k = 0; k < cols; ++k){
+				result += check(board, i, k);
+			}
+		}
+
+		return result;
+	}
+private:
+	int check(std::vector<std::vector<char>>& board, int x, int y){
+		if (board[x][y] == '.') return 0;
+		int row_num = check(board, x, y, true);
+		int col_num = check(board, x, y, false);
+		int result = (row_num >= 3 ? row_num : 0) + (col_num >= 3 ? col_num : 0);
+		if (row_num >= 3 && col_num >= 3) result--;
+		if (result >= 3){
+			board[x][y] = '.';
+			update(board);
+		}
+		return result;
+	}
+
+	int check(std::vector<std::vector<char>>& board, int x, int y, bool isRow){
+		if (board[x][y] == '.') return 0;
+		int sameNum = 1;
+		dfs(board, x, y, sameNum, isRow);
+		if (sameNum >= 3){
+			vanish(board, x, y, isRow);
+		}
+		return sameNum;
+	}
+
+	void dfs(std::vector<std::vector<char>>& board, int x, int y, int& totalNum, bool isRow){
+		const int rows = board.size();
+		const int cols = board.front().size();
+		std::vector<std::pair<int, int>> directions;
+		if (isRow == false){
+			directions = std::vector<std::pair<int, int>>{{ x + 1, y }, { x - 1, y }};
+		}else{
+			directions = std::vector<std::pair<int, int>>{{ x, y - 1 }, { x, y + 1 }};
+		}
+		visited[x][y] = 1;
+		for (int i = 0; i < directions.size(); ++i){
+			int nextX = directions[i].first, nextY = directions[i].second;
+			if (nextX < 0 || nextY < 0 || nextX >= rows || nextY >= cols 
+				|| board[x][y] != board[nextX][nextY] || visited[nextX][nextY] == 1) 
+				continue;
+			totalNum++;
+			dfs(board, nextX, nextY, totalNum, isRow);
+		}
+		visited[x][y] = 0;
+	}
+
+	void update(std::vector<std::vector<char>>& board){
+		const int rows = board.size();
+		const int cols = board.front().size();
+		for (int i = 0; i < cols; ++i){
+			int not_dot_index = rows - 1;
+			for (int k = rows - 1; k >= 0; --k){
+				if (board[k][i] != '.'){
+					if (k != not_dot_index){
+						board[not_dot_index][i] = board[k][i];
+						board[k][i] = '.';
+					}
+					not_dot_index--;
+				}
+			}
+		}
+	}
+
+	void vanish(std::vector<std::vector<char>>& board, int x, int y, bool isRow){
+		const char cur_ch = board[x][y];
+		if (isRow){
+			for (int i = y - 1; i >= 0 && board[x][i] == cur_ch; --i){
+				board[x][i] = '.';
+			}
+			for (int i = y + 1; i < board.front().size() && board[x][i] == cur_ch; ++i){
+				board[x][i] = '.';
+			}
+		} else{
+			for (int i = x - 1; i >= 0 && board[i][y] == cur_ch; --i){
+				board[i][y] = '.';
+			}
+			for (int i = x + 1; i < board.size() && board[i][y] == cur_ch; ++i){
+				board[i][y] = '.';
+			}
+		}
+	}
+private:
+	std::vector<std::vector<int>> visited;
+};

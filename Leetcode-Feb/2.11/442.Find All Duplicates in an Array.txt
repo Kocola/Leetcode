@@ -1,0 +1,23 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	vector<int> findDuplicates(vector<int>& nums) {
+		if (nums.empty()) return std::vector<int>();
+
+		/* 将nums[i]放在i+1的位置 */
+		for (int i = 0; i < nums.size(); ++i){
+			while (nums[nums[i] - 1] != nums[i]){
+				std::swap(nums[nums[i] - 1], nums[i]);
+			}
+		}
+		/* 遍历nums，如果nums[i] != i + 1，那么nums[i]必然是重复的数 */
+		std::vector<int> result;
+		for (int i = 0; i < nums.size(); ++i){
+			if (nums[i] != (i + 1)){
+				result.push_back(nums[i]);
+			}
+		}
+
+		return result;
+	}
+};

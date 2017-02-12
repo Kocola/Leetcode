@@ -1,0 +1,16 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int findPoisonedDuration(vector<int>& timeSeries, int duration) {
+		if (timeSeries.empty()) return 0;
+		int result = 0;
+		int last_time = timeSeries.front();
+		for (int i = 1; i < timeSeries.size(); ++i){
+			int interval = timeSeries[i] - last_time;
+			result += std::min(interval, duration);
+			last_time = timeSeries[i];
+		}
+		result = result + duration;	/* 最后一次攻击持续时间计入 */
+		return result;
+	}
+};

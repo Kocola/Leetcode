@@ -1,0 +1,28 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+	typedef long long int64_t;
+public:
+	int thirdMax(vector<int>& nums) {
+		if (nums.empty()) return -1;
+		if (nums.size() == 1) return nums.front();
+
+		int64_t maxNum = nums[0];	/* int64_t：数据例子[1,2,std::numeric_limits<int>::min()] */
+		int64_t secondNum = std::numeric_limits<int64_t>::min();
+		int64_t thirdNum = std::numeric_limits<int64_t>::min();
+		for (int i = 1; i < nums.size(); ++i){
+			if (nums[i] == maxNum || nums[i] == secondNum) continue;	/* 重复数不计，数据例子：[1,2,2]，返回2 */
+			if (nums[i] > maxNum){
+				thirdNum = secondNum;
+				secondNum = maxNum;
+				maxNum = nums[i];
+			} else if(nums[i] > secondNum){
+				thirdNum = secondNum;
+				secondNum = nums[i];
+			} else if (nums[i] > thirdNum){
+				thirdNum = nums[i];
+			}
+		}
+
+		return thirdNum != std::numeric_limits<int64_t>::min() ? thirdNum : maxNum;
+	}
+};

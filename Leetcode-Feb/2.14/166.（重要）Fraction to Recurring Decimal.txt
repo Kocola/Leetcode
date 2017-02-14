@@ -1,0 +1,37 @@
+1.时间:O（N）；空间：O（1）
+class Solution {
+	typedef long long int64_t;
+public:
+	string fractionToDecimal(int numerator, int denominator) {
+		if (numerator == 0) return "0";
+
+		std::string result = ((numerator >> 31) ^ (denominator >> 31)) ? "-" : "";
+		int64_t _numerator = numerator;
+		int64_t _denominator = denominator;
+
+		int64_t _numerator = std::abs(_numerator);	/* std::abs(-2147483648) = -2147483648 */
+		int64_t _denominator = std::abs(_denominator);
+
+		result += std::to_string(_numerator / _denominator);
+		if (_numerator % _denominator == 0)	/* 如果没有小数部分，那么直接返回 */
+			return result;
+
+		result += ".";
+		int64_t remainder = _numerator % _denominator;
+
+		std::unordered_map<int, int> hashTable;
+		while (remainder != 0 && hashTable.find(remainder) == hashTable.end()){
+			hashTable.insert(std::pair<int, int>(remainder, result.size()));	/* 保存result.size()是为了找到循环体的开始位置 */
+			remainder *= 10;
+			result += std::to_string(remainder / _denominator);
+			remainder %= _denominator;
+		}
+
+		if (remainder != 0){
+			result.insert(hashTable[remainder], 1, '(');
+			result += ")";
+		}
+
+		return result;
+	}
+};

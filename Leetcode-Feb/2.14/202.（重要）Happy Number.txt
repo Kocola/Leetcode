@@ -1,0 +1,28 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨£©
+class Solution {
+public:
+	bool isHappy(int n) {
+		if (n <= 0) return false;
+
+		std::unordered_set<int> hashTable;
+		int num = n;
+		while (hashTable.find(num) == hashTable.end()){
+			hashTable.insert(num);
+			num = calcSquare(num);
+			if (num == 1) return true;
+		}
+
+		return false;
+	}
+private:
+	inline int calcSquare(int num){
+		if (num == 0) return 0;
+		int result = 0;
+		while (num != 0){
+			int tmp = num % 10;
+			result += tmp * tmp;
+			num /= 10;
+		}
+		return result;
+	}
+};

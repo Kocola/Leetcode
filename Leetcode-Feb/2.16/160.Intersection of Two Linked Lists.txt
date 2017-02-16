@@ -1,0 +1,79 @@
+1.时间：O（N）；空间：O（1）	->快慢指针
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+		if (headA == nullptr || headB == nullptr) return nullptr;
+		/* 将headA链表首尾连接 */
+		ListNode* lastA = headA;
+		while (lastA->next != nullptr){
+			lastA = lastA->next;
+		}
+		lastA->next = headA;
+		/* 设置快慢指针，以HeadB开始，如果两者能够重合，那么
+			必然有公共部分，然后设置额外的慢指针，和慢指针一起
+			找到公共部分入口结点 */
+		ListNode* fast = headB, *slow = headB;
+		while (fast != nullptr && fast->next != nullptr){
+			slow = slow->next;
+			fast = fast->next->next;
+			if (slow == fast) break;
+		}
+		ListNode* find = nullptr;	/* 默认没有环，未找到 */
+		if (!(fast == nullptr || fast->next == nullptr)){
+			find = headB;
+			while (find != slow){
+				find = find->next;
+				slow = slow->next;
+			}
+		}
+		/* 恢复headA */
+		lastA->next = nullptr;
+		return find;
+	}
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+		if (headA == nullptr || headB == nullptr) return nullptr;
+		/* 计算两个链表的长度，同时记录他们的最后一个指针 */
+		int aLen = 1;
+		ListNode* lastA = headA;
+		while (lastA->next != nullptr){
+			lastA = lastA->next;
+			aLen++;
+		}
+		int bLen = 1;
+		ListNode* lastB = headB;
+		while (lastB->next != nullptr){
+			lastB = lastB->next;
+			bLen++;
+		}
+		/* 如果最后一个指针不同，必然没有交集 */
+		if (lastA != lastB) return nullptr;
+
+		ListNode* pL = headA, *pS = headB;
+		if (aLen < bLen){
+			std::swap(pL, pS);
+		}
+		const int lenDiff = std::abs(aLen - bLen);
+		for (int i = 0; i < lenDiff; ++i){
+			pL = pL->next;
+		}
+
+		while (pL != nullptr && pL != pS){
+			pL = pL->next;
+			pS = pS->next;
+		}
+
+		return pL;
+	}
+};

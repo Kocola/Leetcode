@@ -1,0 +1,83 @@
+1.时间：O（NLOGN）；空间：O（N）
+/**
+* Definition for a binary tree node.
+*/
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+class Solution {
+public:
+	vector<int> findFrequentTreeSum(TreeNode* root) {
+		if (root == nullptr) return std::vector<int>();
+		std::unordered_map<int, int> hashTable;
+		postOrder(hashTable, root);
+		std::vector<std::pair<int, int>> pairs;
+		for (auto it : hashTable){
+			pairs.push_back(std::pair<int, int>(it.second, it.first));
+		}
+		std::sort(pairs.begin(), pairs.end(), cmp);
+		std::vector<int> result;
+		result.push_back(pairs.front().second);
+		for (int i = 1; i < pairs.size(); ++i){
+			if (pairs[i].first == pairs[i - 1].first){
+				result.push_back(pairs[i].second);
+			}
+		}
+		return result;
+	}
+private:
+	int postOrder(std::unordered_map<int, int>& hashTable, TreeNode* root){
+		if (root == nullptr) return 0;
+		int sum = root->val;
+		if (root->left != nullptr) sum += postOrder(hashTable, root->left);
+		if (root->right != nullptr) sum += postOrder(hashTable, root->right);
+		hashTable[sum]++;
+		return sum;
+	}
+
+	static bool cmp(const std::pair<int, int>& a, const std::pair<int, int>& b){
+		return a.first > b.first;
+	}
+};
+2.时间：O（N）；空间：O（N）
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	vector<int> findFrequentTreeSum(TreeNode* root) {
+		if (root == nullptr) return std::vector<int>();
+		std::unordered_map<int, int> hashTable;
+		postOrder(hashTable, root);
+		int max_frequency = 0;
+		for (auto it : hashTable){
+			max_frequency = std::max(max_frequency, it.second);
+		}
+		std::vector<int> result;
+		for (auto it : hashTable){
+			if (it.second == max_frequency){
+				result.push_back(it.first);
+			}
+		}
+		return result;
+	}
+private:
+	int postOrder(std::unordered_map<int, int>& hashTable, TreeNode* root){
+		if (root == nullptr) return 0;
+		int sum = root->val;
+		if (root->left != nullptr) sum += postOrder(hashTable, root->left);
+		if (root->right != nullptr) sum += postOrder(hashTable, root->right);
+		hashTable[sum]++;
+		return sum;
+	}
+};

@@ -1,0 +1,39 @@
+1.时间：O（N）；空间：O（N）	->单向hash，存在问题（数据例子：["ab"], ["aa"]）
+class Solution {
+public:
+	bool isIsomorphic(string s, string t) {
+		if (s.size() != t.size()) return false;
+		std::unordered_map<char, char> hashTable;
+		for (int i = 0; i < s.size(); ++i){
+			if (hashTable.find(s[i]) != hashTable.end()){
+				if (hashTable[s[i]] != t[i]) return false;
+			} else{
+				hashTable[s[i]] = t[i];
+			}
+		}
+		return true;
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	bool isIsomorphic(string s, string t) {
+		if (s.size() != t.size()) return false;
+		std::unordered_map<int, int> sTable;
+		std::unordered_map<int, int> tTable;
+		for (int i = 0; i < s.size(); ++i){
+			auto sFind = sTable.find(s[i]);
+			auto tFind = tTable.find(t[i]);
+			if (sFind != sTable.end() && tFind != tTable.end()){
+				if (sTable[s[i]] != t[i] || tTable[t[i]] != s[i]){
+					return false;
+				}
+			} else{
+				if (sFind != sTable.end() || tFind != tTable.end()) return false;
+				sTable[s[i]] = t[i];
+				tTable[t[i]] = s[i];
+			}
+		}
+		return true;
+	}
+};

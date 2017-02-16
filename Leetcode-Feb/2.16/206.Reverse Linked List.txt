@@ -1,0 +1,50 @@
+1.时间：O（N）；空间：O（1）
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* reverseList(ListNode* head) {
+		if (head == nullptr || head->next == nullptr) return head;
+		ListNode headNode(-1);
+		ListNode* cur = head;
+		while (cur != nullptr){
+			ListNode* cur_next = cur->next;
+			cur->next = headNode.next;
+			headNode.next = cur;
+			cur = cur_next;
+		}
+		head = headNode.next;
+		return head;
+	}
+};
+2.时间：O（N）；空间：O（1）
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+	ListNode* reverseList(ListNode* head) {
+		if (head == nullptr || head->next == nullptr) return head;
+		ListNode* prev = head, *cur = prev->next;
+		prev->next = nullptr;
+		while (cur != nullptr){
+			ListNode* cur_next = cur->next;
+			cur->next = prev;
+			prev = cur;
+			cur = cur_next;
+		}
+		head = prev;
+		return head;
+	}
+};

@@ -1,0 +1,27 @@
+1.Ê±¼ä£ºO£¨N^2£©;¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	int islandPerimeter(vector<vector<int>>& grid) {
+		if (grid.empty() || grid.front().empty()) return 0;
+		const int rows = grid.size();
+		const int cols = grid.front().size();
+		int perimeter = 0;
+		for (int i = 0; i < rows; ++i){
+			for (int k = 0; k < cols; ++k){
+				if (grid[i][k] == 0) continue;
+				perimeter += 4;
+				if (i > 0 && grid[i-1][k] == 1) perimeter--;
+				if (k > 0 && grid[i][k-1] == 1) perimeter--;
+				if (i < rows - 1 && grid[i+1][k] == 1) perimeter--;
+				if (k < cols - 1 && grid[i][k+1] == 1) perimeter--;
+			}
+		}
+		return perimeter;
+	}
+/*private:
+	inline bool island(const std::vector<std::vector<int>>& grid, int row, int col){
+		const int rows = grid.size();
+		const int cols = grid.front().size();
+		return !(row < 0 || col < 0 || row >= rows || col >= cols || grid[row][col] == 0);
+	}*/
+};

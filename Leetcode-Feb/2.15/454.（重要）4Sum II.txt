@@ -1,0 +1,28 @@
+1.时间：O（N^2）;空间：O（N^2）
+class Solution {
+public:
+	int fourSumCount(vector<int>& A, vector<int>& B, vector<int>& C, vector<int>& D) {
+		std::sort(A.begin(), A.end());
+		std::sort(B.begin(), B.end());
+		std::sort(C.begin(), C.end());
+		std::sort(D.begin(), D.end());/* 排序后可以加快速度 */
+
+		std::unordered_map<int, int> hashTable;
+		for (int i = 0; i < A.size(); ++i){
+			for (int k = 0; k < B.size(); ++k){
+				int sum = A[i] + B[k];
+				hashTable[sum]++;
+			}
+		}
+		int result = 0;
+		for (int i = 0; i < C.size(); ++i){
+			for (int k = 0; k < D.size(); ++k){
+				int sum = -1 * (C[i] + D[k]);
+				if (hashTable.find(sum) != hashTable.end()){
+					result += hashTable[sum];
+				}
+			}
+		}
+		return result;
+	}
+};

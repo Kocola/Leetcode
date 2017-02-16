@@ -1,0 +1,16 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	int longestPalindrome(string s) {
+		std::vector<int> hashTable(128, 0);
+		for (int i = 0; i < s.size(); ++i){
+			hashTable[s[i]]++;
+		}
+		int oddNum = 0, evenNum = 0;
+		for (int i = 0; i < hashTable.size(); ++i){
+			evenNum += (hashTable[i] >> 1) << 1;
+			oddNum += hashTable[i] & 0x01;
+		}
+		return evenNum + (oddNum > 0 ? 1 : 0);
+	}
+};

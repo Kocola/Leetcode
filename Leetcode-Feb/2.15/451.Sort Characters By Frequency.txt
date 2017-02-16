@@ -1,0 +1,24 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	string frequencySort(string s) {
+		if (s.size() < 3) return s;
+		std::string result;
+		std::vector<std::pair<int, char>> hashTable(128);
+		for (int i = 0; i < 128; ++i){
+			hashTable[i] = std::pair<int, char>(0, (char)i);
+		}
+		for (int i = 0; i < s.size(); ++i){
+			hashTable[s[i] - '\0'].first++;
+		}
+		std::sort(hashTable.begin(), hashTable.end(), cmp);
+		for (int i = 0; i < hashTable.size() && hashTable[i].first > 0; ++i){
+			result += std::string(hashTable[i].first, hashTable[i].second);
+		}
+		return result;
+	}
+private:
+	static bool cmp(const std::pair<int, int>& a, const std::pair<int, int>& b){
+		return a.first > b.first;
+	}
+};

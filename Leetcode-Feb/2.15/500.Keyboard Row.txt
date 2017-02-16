@@ -1,0 +1,29 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	vector<string> findWords(vector<string>& words) {
+		if (words.empty()) return std::vector<std::string>();
+		std::vector<std::vector<char>> keyboard{ { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P' },
+		{ 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L' }, { 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } };
+		std::vector<int> hashTable(128);
+		for (int i = 0; i < keyboard.size(); ++i){
+			for (int k = 0; k < keyboard[i].size(); ++k){
+				hashTable[keyboard[i][k]] = i + 1;
+			}
+		}
+		std::vector<std::string> result;
+		for (int i = 0; i < words.size(); ++i){
+			const std::string word = words[i];
+			bool is_one_row = true;
+			int cur_row = hashTable[toupper(word[0])];
+			for (int k = 1; k < word.size(); ++k){
+				if (hashTable[toupper(word[k])] != cur_row){
+					is_one_row = false;
+					break;
+				}
+			}
+			if (is_one_row) result.push_back(word);
+		}
+		return result;
+	}
+};

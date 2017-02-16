@@ -1,0 +1,21 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨N£©
+class Solution {
+public:
+	vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+		if (nums1.empty() || nums2.empty()) return std::vector<int>();
+		std::unordered_map<int, int> hashTable;
+		for (int i = 0; i < nums1.size(); ++i){
+			if (hashTable.find(nums1[i]) == hashTable.end()){
+				hashTable[nums1[i]] = 1;
+			}
+		}
+		std::vector<int> result;
+		for (int i = 0; i < nums2.size(); ++i){
+			if (hashTable[nums2[i]] == 1){
+				result.push_back(nums2[i]);
+				hashTable[nums2[i]] = 0;
+			}
+		}
+		return result;
+	}
+};

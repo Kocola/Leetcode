@@ -1,0 +1,68 @@
+1.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	string getHint(string secret, string guess) {
+		if (secret.size() != guess.size()) return "";
+		std::unordered_map<int, int> pos_num;
+		std::unordered_map<int, int> num_count;
+		/* 预处理 */
+		for (int i = 0; i < secret.size(); ++i){
+			int num = secret[i] - '0';
+			pos_num[i] = num;
+			if (num_count.find(num) != num_count.end()){
+				num_count[num]++;
+			} else{
+				num_count[num] = 1;
+			}
+		}
+		int cowsNum = 0, bullsNum = 0;
+		/* cows和bulls分开处理，数据例子：["01", "11"] */
+		for (int i = 0; i < guess.size(); ++i){
+			int num = guess[i] - '0';
+			if (pos_num[i] == num){	/* ["1", "0"] */
+				bullsNum++;
+				num_count[num]--;
+			}
+		}
+		for (int i = 0; i < guess.size(); ++i){
+			int num = guess[i] - '0';
+			if (pos_num[i] != num && num_count[num] > 0){
+				cowsNum++;
+				num_count[num]--;
+			}
+		}
+		return std::to_string(bullsNum) + "A" + std::to_string(cowsNum) + "B";
+	}
+};
+
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	string getHint(string secret, string guess) {
+		if (secret.size() != guess.size()) return "";
+		int bullsNum = 0;
+		for (int i = 0; i < secret.size(); ++i){
+			if (secret[i] == guess[i]) bullsNum++;
+		}
+		std::unordered_map<int, int> hashTable;
+		for (int i = 0; i < secret.size(); ++i){
+			if (secret[i] == guess[i]) continue;
+			int num = secret[i] - '0';
+			if (hashTable.find(num) != hashTable.end()){
+				hashTable[num]++;
+			} else{
+				hashTable[num] = 1;
+			}
+		}
+		int cowsNum = 0;
+		for (int i = 0; i < guess.size(); ++i){
+			if (secret[i] == guess[i]) continue;
+			int num = guess[i] - '0';
+			if (hashTable[num] > 0){
+				cowsNum++;
+				hashTable[num]--;
+			}
+		}
+		return std::to_string(bullsNum) + "A" + std::to_string(cowsNum) + "B";
+	}
+};

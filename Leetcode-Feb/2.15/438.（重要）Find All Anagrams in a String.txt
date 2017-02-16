@@ -1,0 +1,54 @@
+1.时间：O（N*M）；空间：O（1）
+class Solution {
+public:
+	vector<int> findAnagrams(string s, string p) {
+		if (p.empty() || s.size() < p.size()) return std::vector<int>();
+		std::vector<int> hashTable(26, 0);
+		for (int i = 0; i < p.size(); ++i){
+			hashTable[p[i] - 'a']++;
+		}
+		std::vector<int> result;
+		const int Upper = s.size() - p.size();
+		for (int i = 0; i <= Upper; ++i){	/* Upper ~ s.size() - 1也可能匹配 */
+			if (isAnagrams(s.substr(i, p.size()), hashTable))
+				result.push_back(i);
+		}
+		return result;
+	}
+private:
+	bool isAnagrams(const std::string& str, std::vector<int> hashTable){
+		for (int i = 0; i < str.size(); ++i){
+			if (--hashTable[str[i] - 'a'] < 0) return false;
+		}
+		return true;
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	vector<int> findAnagrams(string s, string p) {
+		if (p.empty() || s.size() < p.size()) return std::vector<int>();
+		std::vector<int> hashTable(26, 0);
+		for (int i = 0; i < p.size(); ++i){
+			hashTable[p[i] - 'a']++;
+		}
+		std::vector<int> result;
+		const int Upper = s.size() - p.size();
+		int need = p.size();
+		int start_index = 0;
+		for (int i = 0; i < s.size(); ++i){
+			const int index = s[i] - 'a';
+			if (--hashTable[index] >= 0) need--;
+			if (need == 0) result.push_back(start_index);
+			if (i - start_index == p.size() - 1){
+				hashTable[s[start_index] - 'a']++;
+				if (hashTable[s[start_index] - 'a'] > 0){
+					need++;
+				}
+				start_index++;
+			}
+		}
+		if (need == 0) result.push_back(start_index);
+		return result;
+	}
+};

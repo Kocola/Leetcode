@@ -1,0 +1,42 @@
+1.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	char findTheDifference(string s, string t) {
+		if (t.size() != s.size() + 1) return ' ';
+		std::unordered_map<char, int> hashTable;
+		for (int i = 0; i < s.size(); ++i){
+			char ch = s[i];
+			if (hashTable.find(ch) != hashTable.end()){
+				hashTable[ch]++;
+			} else{
+				hashTable[ch] = 1;
+			}
+		}
+		for (int i = 0; i < t.size(); ++i){
+			char ch = t[i];
+			if (hashTable[ch] < 1) return ch;
+			else{
+				hashTable[ch]--;
+			}
+		}
+		return ' ';
+	}
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+/* 数据范围限定在：a~z */
+public:
+	char findTheDifference(string s, string t) {
+		if (t.size() != s.size() + 1) return ' ';
+		std::vector<int> hashTable(26, 0);
+		for (int i = 0; i < s.size(); ++i){
+			hashTable[s[i] - 'a']++;
+		}
+		for (int i = 0; i < t.size(); ++i){
+			int index = t[i] - 'a';
+			hashTable[index]--;
+			if (hashTable[index] < 0) return t[i];
+		}
+		return ' ';
+	}
+};

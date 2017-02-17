@@ -1,0 +1,28 @@
+1.时间：O（）；空间：O（1）	->溢出：数据例子[1808548329]
+class Solution {
+public:
+	int trailingZeroes(int n) {
+		int count = 0, dividend = 5;;
+		while (1){
+			int num = n / dividend;
+			if (num < 1) break;
+			count += num;
+			dividend *= 5;
+		}
+		return count;
+	}
+};
+
+2.时间：O（）；空间：O（1）
+class Solution {
+public:
+	int trailingZeroes(int n) {
+		int count = 0;
+		while (n > 0){
+			int num = n / 5;
+			count += num;
+			n = num;
+		}
+		return count;
+	}
+};

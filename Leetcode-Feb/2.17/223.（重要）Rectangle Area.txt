@@ -1,0 +1,26 @@
+1.时间：O（1）；空间：O（1）	->计算公共区域面积，而且还有问题
+class Solution {
+public:
+	int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
+		if ((A < E && E < C) && (B < H && H < D)){
+			return (C - E) * (H - B);
+		}
+		if ((E < A && A < G) && (F < D && D < H)){
+			return (G - A) * (D - F);
+		}
+		return 0;
+	}
+};
+2.时间：O（1）；空间：O（1）
+class Solution {
+public:
+	int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
+		/* 计算两个矩形的面积 */
+		int area = (C - A) * (D - B) + (G - E) * (H - F);
+		/* 如果两个矩形没有公共区域，则直接返回 */
+		if (F > D || H < B || G < A || E > C) return area;
+		/* 减去两个矩形的公共区域 */
+		area -= (std::min(C, G) - std::max(A, E)) * (std::min(H, D) - std::max(B, F));
+		return area;
+	}
+};

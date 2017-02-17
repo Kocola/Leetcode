@@ -1,0 +1,14 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+	typedef long long int64_t;
+public:
+	int countDigitOne(int n) {
+		int result = 0;
+		for (int64_t m = 1; m <= n; m *= 10){
+			int a = n / m, b = n % m;
+			result += (a + 8) / 10 * m;
+			if (a % 10 == 1) result += (b + 1);
+		}
+		return result;
+	}
+};

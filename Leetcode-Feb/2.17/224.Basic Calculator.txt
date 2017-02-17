@@ -1,0 +1,119 @@
+1.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	int calculate(string s) {
+		if (s.size() == 0) return 0;
+		std::stack<char> signs;
+		std::queue<std::string> queue;
+		std::string num;
+		/* 求后缀表达式 */
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] >= '0' && s[i] <= '9'){
+				num += s[i];
+			} else{
+				if (num != "") queue.push(num);
+				if (s[i] == '(') signs.push(s[i]);
+				else if (s[i] == ')'){
+					while (signs.top() != '('){
+						queue.push(signs.top() == '+' ? "+" : "-");
+						signs.pop();
+					}
+					signs.pop();
+				} else if (s[i] == '+' || s[i] == '-'){
+					if (signs.empty()) signs.push(s[i]);
+					else{
+						if (signs.top() == '+' || signs.top() == '-'){
+							queue.push(signs.top() == '+' ? "+" : "-");
+							signs.pop();
+						}
+					    signs.push(s[i]);
+					}
+				}
+				num.clear();
+			}
+		}
+		if (num != "") queue.push(num);
+		while (!signs.empty()){
+			queue.push(signs.top() == '+' ? "+" : "-");
+			signs.pop();
+		}
+		/* 后缀表达式计算 */
+		std::stack<int> result;
+		while (!queue.empty()){
+			if (queue.front() == "+" || queue.front() == "-"){
+				int numTwo = result.top();
+				result.pop();
+				int numOne = result.top();
+				result.pop();
+				if(queue.front() == "+") result.push(numOne + numTwo);
+				else result.push(numOne - numTwo);
+			} else{
+				result.push(atoi(queue.front().c_str()));
+			}
+			queue.pop();
+		}
+		return result.top();
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+	const int PLUS = -1;
+	const int SUBSTRACT = -2;
+public:
+	int calculate(string s) {
+		if (s.size() == 0) return 0;
+		std::stack<char> signs;
+		std::queue<int> queue;
+		int num = -1;
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] >= '0' && s[i] <= '9'){
+				if (num == -1) num = 0;
+				num = num * 10 + s[i] - '0';
+			}
+			else{
+				if (num != -1) queue.push(num);
+				if (s[i] == '(') signs.push(s[i]);
+				else if (s[i] == ')'){
+					while (signs.top() != '('){
+						queue.push(signs.top() == '+' ? PLUS : SUBSTRACT);
+						signs.pop();
+					}
+					signs.pop();
+				}
+				else if (s[i] == '+' || s[i] == '-'){
+					if (!signs.empty()){
+						if (signs.top() == '+' || signs.top() == '-'){
+							queue.push(signs.top() == '+' ? PLUS : SUBSTRACT);
+							signs.pop();
+						}
+					}
+					signs.push(s[i]);
+				}
+				num = -1;
+			}
+		}
+		if (num != -1) queue.push(num);
+		while (!signs.empty()){
+			queue.push(signs.top() == '+' ? PLUS : SUBSTRACT);
+			signs.pop();
+		}
+		//if (queue.empty()) return 0;	/* 数据例子：["0"] */
+		/* 计算后缀表达式 */
+		std::stack<int> result;
+		while (!queue.empty()){
+			if (queue.front() == PLUS || queue.front() == SUBSTRACT){
+				int numTwo = result.top();
+				result.pop();
+				int numOne = result.top();
+				result.pop();
+				if (queue.front() == PLUS) result.push(numOne + numTwo);
+				else if (queue.front() == SUBSTRACT) result.push(numOne - numTwo);
+			}
+			else{
+				result.push(queue.front());
+			}
+			queue.pop();
+		}
+		return result.top();
+	}
+};

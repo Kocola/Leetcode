@@ -1,0 +1,24 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨N£©
+class Solution {
+public:
+	int nthSuperUglyNumber(int n, vector<int>& primes) {
+		const int size = primes.size();
+		std::vector<int> dp(n, 0), index(size, 0);
+		std::vector<int> vals = primes;
+		dp[0] = 1;
+		for (int i = 1; i < n; ++i){
+			int min_val = std::numeric_limits<int>::max();
+			for (int k = 0; k < size; ++k){
+				min_val = std::min(min_val, vals[k]);
+			}
+			for (int k = 0; k < size; ++k){
+				if (min_val == vals[k]){
+					dp[i] = vals[k];
+					index[k]++;
+					vals[k] = dp[index[k]] * primes[k];
+				}
+			}
+		}
+		return dp[n-1];
+	}
+};

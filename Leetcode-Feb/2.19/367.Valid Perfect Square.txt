@@ -1,0 +1,27 @@
+1.时间：O（sqrt（N））；空间：O（N）
+class Solution {
+public:
+	bool isPerfectSquare(int num) {
+		if (num < 0) return false;
+		int index = 0;
+		for (; index * index < num; ++index); 
+		return index * index == num;
+	}
+};
+2.时间：O（LOGN）；空间：O（1）
+class Solution {
+	typedef long long int64_t;
+public:
+	bool isPerfectSquare(int num) {
+		if (num < 0) return false;
+		int lower = 0, higher = num;
+		while (lower <= higher){
+			int mid = lower + ((higher - lower) >> 1);
+			int64_t product = (int64_t)mid * mid;	/* mid * mid会有错误，必须强制转换一次 */
+			if (product == num) return true;
+			else if (product < num) lower = mid + 1;
+			else higher = mid - 1;
+		}
+		return false;
+	}
+};

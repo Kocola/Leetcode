@@ -1,0 +1,69 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int compareVersion(string version1, string version2) {
+		if (version1.empty() || version2.empty()) return 0;
+		int index_1 = 0, index_2 = 0;
+		for (; index_1 < version1.size() && index_2 < version2.size();){
+			int next_1 = std::distance(version1.begin(), std::find(std::next(version1.begin(), index_1), version1.end(), '.'));
+			int num_1 = atoi(version1.substr(index_1, next_1 - index_1 + 1).c_str());
+			int next_2 = std::distance(version2.begin(), std::find(std::next(version2.begin(), index_2), version2.end(), '.'));
+			int num_2 = atoi(version2.substr(index_2, next_2 - index_2 + 1).c_str());
+			if (num_1 < num_2) return -1;
+			else if (num_1 > num_2) return 1;
+			index_1 = next_1 + 1;
+			index_2 = next_2 + 1;
+		}
+		if (index_1 < version1.size()){
+			while (index_1 < version1.size()){
+				if (version1[index_1] > '0' && version1[index_1] <= '9'){
+					return 1;
+				}
+				index_1++;
+			}
+			return 0; 
+		}
+		if (index_2 < version2.size()){
+			while (index_2 < version2.size()){
+				if (version2[index_2] > '0' && version2[index_2] <= '9'){
+					return -1;
+				}
+				index_2++;
+			}
+			return 0;
+		}
+		return 0;
+	}
+};
+2.时间：O（N）；空间：O（N）	-->>较慢
+class Solution {
+public:
+	int compareVersion(string version1, string version2) {
+		if (version1.empty() || version2.empty()) return 0;
+		std::vector<int> ver1 = calcVersion(version1);
+		std::vector<int> ver2 = calcVersion(version2);
+		/* 长度不一致时，补0 */
+		int diff = std::abs((int)ver1.size() - (int)ver2.size());
+		for (int i = 0; i < diff; ++i){
+			if (ver1.size() < ver2.size()) ver1.push_back(0);
+			else if (ver1.size() > ver2.size()) ver2.push_back(0);
+		}
+		/* 比较 */
+		for (int i = 0; i < ver1.size(); ++i){
+			if (ver1[i] < ver2[i]) return -1;
+			else if (ver1[i] > ver2[i]) return 1;
+		}
+		return 0;
+	}
+private:
+	inline std::vector<int> calcVersion(const std::string& str){
+		std::vector<int> result;
+		for (int i = 0; i < str.size();){
+			int last = str.find('.', i);
+			last = last == -1 ? str.size() : last;
+			result.push_back(atoi(str.substr(i, last - i).c_str()));
+			i = last + 1;
+		}
+		return result;
+	}
+};

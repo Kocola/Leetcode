@@ -1,0 +1,21 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	string reverseVowels(string s) {
+		if (s.size() < 2) return s;
+		int lower = 0, upper = s.size() - 1;
+		while (lower < upper){
+			if (!isVowel(s[lower])) ++lower;
+			else if (!isVowel(s[upper])) --upper;
+			else{
+				std::swap(s[lower++], s[upper--]);
+			}
+		}
+		return s;
+	}
+private:
+	inline bool isVowel(char ch){
+		ch = tolower(ch);
+		return ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u';
+	}
+};

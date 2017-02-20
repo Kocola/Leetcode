@@ -1,0 +1,40 @@
+1.时间：O（N^2）;空间：O（1）
+class Solution {
+public:
+	void reverseWords(string &s) {
+		/* 去除前导和后导空格 */
+		int start = 0;
+		while (start < s.size() && s[start] == ' ') start++;
+		int end = s.size() - 1;
+		while (end >= start && s[end] == ' ') end--;
+		/* 去除中间连续的多个空格，仅保留一个 */
+		int valid_str_index = 0;
+		for (int i = start; i <= end; ++i){
+			if (i < end - 1 && s[i] == ' ' && s[i + 1] == ' ') continue;
+			s[valid_str_index++] = s[i];
+		}
+		s.resize(valid_str_index);
+
+		/* 找到并反转每个字符串 */
+		bool is_space = true;
+		int start_index = -1, end_index = s.size() - 1;
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] == ' '){
+				if (is_space == false) reverse(s, start_index, i - 1);
+				is_space = true;
+			} else{
+				if (is_space == true) start_index = i;
+				is_space = false;
+			}
+		}
+		if (is_space == false) reverse(s, start_index, end_index);
+		/* 整体反转一次 */
+		reverse(s, 0, s.size() - 1);
+	}
+private:
+	void reverse(std::string& s, int start, int end){
+		while (start < end){
+			std::swap(s[start++], s[end--]);
+		}
+	}
+};

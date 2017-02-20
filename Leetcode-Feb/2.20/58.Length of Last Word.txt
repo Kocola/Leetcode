@@ -1,0 +1,20 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	int lengthOfLastWord(string s) {
+		if (s.empty()) return 0;
+		bool is_space = true;
+		int start_index = -1, end_index = s.size() - 1;
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] == ' '){
+				if (is_space == false) end_index = i - 1;
+				is_space = true;
+			} else if (isalpha(s[i])){
+				if (is_space) start_index = i;
+				is_space = false;
+			}
+		}
+		if (end_index < start_index) end_index = s.size() - 1;
+		return start_index == -1 ? 0 : (end_index - start_index + 1);
+	}
+};

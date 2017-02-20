@@ -1,0 +1,35 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	string originalDigits(string s) {
+		if (s.empty()) return std::string();
+		std::vector<int> count(10, 0);
+		for (int i = 0; i < s.size(); ++i){
+			const char ch = s[i];
+			switch (ch){
+			case 'z': count[0]++; break;
+			case 'o': count[1]++; break;
+			case 'w': count[2]++; break;
+			case 'h': count[3]++; break;
+			case 'u': count[4]++; break;
+			case 'f': count[5]++; break;
+			case 'x': count[6]++; break;
+			case 's': count[7]++; break;
+			case 'g': count[8]++; break;
+			case 'i': count[9]++; break;
+			}
+		}
+		count[5] -= count[4];
+		count[7] -= count[6];
+		count[3] -= count[8];
+		count[1] -= count[0] + count[2] + count[4];
+		count[9] -= count[5] + count[6] + count[8];
+		std::string result;
+		for (int i = 0; i < 10; ++i){
+			for (int k = 0; k < count[i]; ++k){
+				result += i + '0';
+			}
+		}
+		return result;
+	}
+};

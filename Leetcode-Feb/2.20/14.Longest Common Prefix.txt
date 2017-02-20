@@ -1,0 +1,21 @@
+1.时间：O（N*M）；空间：O（1）
+class Solution {
+public:
+	string longestCommonPrefix(vector<string>& strs) {
+		if (strs.empty()) return std::string();
+		/* 找到最小的字符串长度 */
+		int minLen = std::numeric_limits<int>::max();
+		for (int i = 0; i < strs.size(); ++i){
+			minLen = std::min(minLen, (int)strs[i].size());
+		}
+		for (int i = 0; i < minLen; ++i){
+			const int ch = strs.front()[i];
+			for (int k = 0; k < strs.size(); ++k){
+				if (strs[k][i] != ch){
+					return strs[k].substr(0, i);
+				}
+			}
+		}
+		return strs.front().substr(0, minLen);
+	}
+};

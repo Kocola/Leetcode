@@ -1,0 +1,49 @@
+1.时间：O（N^2）;空间：O（1）
+class Solution {
+public:
+	int maxRotateFunction(vector<int>& A) {
+		if (A.empty()) return 0;
+		int result = std::numeric_limits<int>::min();
+		const int size = A.size();
+		for (int i = 0; i < size; ++i){
+			int sum = 0;
+			for (int k = 0; k < size; ++k){
+				int index = (i + k) % size;
+				sum += k * A[index];
+			}
+			result = std::max(result, sum);
+		}
+		return result;
+	}
+};
+2.时间：O（N）；空间：O（1）
+/*
+找规律，先把具体的数字抽象为A,B,C,D，那么我们可以得到：
+F(0) = 0A + 1B + 2C +3D
+F(1) = 0D + 1A + 2B +3C
+F(2) = 0C + 1D + 2A +3B
+F(3) = 0B + 1C + 2D +3A
+那么，我们通过仔细观察，我们可以得出下面的规律：
+F(1) = F(0) + sum - 4D
+F(2) = F(1) + sum - 4C
+F(3) = F(2) + sum - 4B
+那么我们就找到规律了, F(i) = F(i-1) + sum - n*A[n-i]
+*/
+class Solution {
+public:
+	int maxRotateFunction(vector<int>& A) {
+		if (A.empty()) return 0;
+		int total = 0, sum = 0;
+		const int size = A.size();
+		for (int i = 0; i < size; ++i){
+			sum += A[i];
+			total += i * A[i];
+		}
+		int result = total;
+		for (int i = 1; i < size; ++i){
+			total = total + sum - size * A[size - i];
+			result = std::max(result, total);
+		}
+		return result;
+	}
+};

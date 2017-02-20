@@ -1,0 +1,46 @@
+1.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	int numberOfArithmeticSlices(vector<int>& A) {
+		if (A.size() < 3) return 0;
+		const int size = A.size();
+		/* 找到第一个diff（A[i+2] - A[i+1] = A[i+1] - A[i]） */
+		int index = 0;
+		int diff = 0, start = 0;
+		for (; index < size; ++index){
+			if (A[index + 2] - A[index + 1] == A[index + 1] - A[index]){
+				diff = A[index + 2] - A[index + 1];
+				start = index;
+				break;
+			}
+		}
+		std::vector<int> count(size, 0);
+		for (index += 2; index < size; ++index){
+			if (A[index] - A[index - 1] == diff){
+				count[index] = std::max(index - start - 1, 0);
+			} else{
+				start = index - 1;
+				diff = A[index] - A[index - 1];
+			}
+		}
+		int result = std::accumulate(count.begin(), count.end(), 0);
+		return result;
+	}
+};
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int numberOfArithmeticSlices(vector<int>& A) {
+		if (A.size() < 3) return 0;
+		const int size = A.size();
+		int count = 0, added = 0;
+		for (int i = 2; i < size; ++i){
+			if (A[i] - A[i - 1] == A[i - 1] - A[i - 2]){
+				count += ++added;
+			} else{
+				added = 0;
+			}
+		}
+		return count;
+	}
+};

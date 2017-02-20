@@ -1,0 +1,17 @@
+1.Ê±¼ä£ºO£¨LOGN£©£»¿Õ¼ä£ºO£¨LOGN£©
+class Solution {
+	typedef long long int64_t;
+public:
+	int findNthDigit(int n) {
+		if (n < 10) return n;
+		int index = 0;
+		int64_t power = 1;
+		for (;; index++, power *= 10){
+			int64_t len = 9 * power;
+			if (n < len * (index + 1)) break;
+			n -= len * (index + 1);
+		}
+		n--;
+		return std::to_string(power + n / (index + 1))[n % (index + 1)] - '0';
+	}
+};

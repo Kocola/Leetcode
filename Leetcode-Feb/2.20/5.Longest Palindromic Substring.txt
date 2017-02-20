@@ -1,0 +1,52 @@
+1.时间：O（O^2）;空间：O（N^2）
+class Solution {
+public:
+	string longestPalindrome(string s) {
+		if (s.size() < 2) return s;
+		std::vector<std::vector<int>> dp(s.size(), std::vector<int>(s.size()));
+		for (int i = 0; i < s.size(); ++i) dp[i][i] = 1;
+		int maxlen = 1, start = 0;
+		for (int i = s.size() - 2; i >= 0; --i){
+			for (int k = i + 1; k < s.size(); ++k){
+				if (s[i] == s[k] && (k - i < 2 || dp[i + 1][k - 1] == 1)){
+					dp[i][k] = 1;
+					if (k - i + 1 > maxlen){
+						start = i;
+						maxlen = k - i + 1;
+					}
+				}
+			}
+		}
+		return s.substr(start, maxlen);
+	}
+};
+1.时间：O（N^2）;空间：O（1）
+class Solution {
+public:
+	string longestPalindrome(string s) {
+		if (s.size() < 2) return s;
+		int start = 0, maxlen = 1;
+		for (int i = 0; i < s.size(); ++i){
+			int len = palindromeLen(s, i, i);
+			if (len > maxlen){
+				start = i - len / 2;
+				maxlen = len;
+			}
+			len = palindromeLen(s, i, i + 1);
+			if (len > maxlen){
+				start = i - len / 2 + 1;
+				maxlen = len;
+			}
+		}
+		return s.substr(start, maxlen);
+	}
+private:
+	int palindromeLen(const std::string& s, int left, int right){
+		const int size = s.size();
+		while ((left >= 0) && (right < size) && (s[left] == s[right])){
+			left--;
+			right++;
+		}
+		return right - left - 1;
+	}
+};

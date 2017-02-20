@@ -1,0 +1,11 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	string reverseString(string s) {
+		if (s.size() < 2) return s;
+		for (int lower = 0, upper = s.size() - 1; lower < upper; ++lower, --upper){
+			std::swap(s[lower], s[upper]);
+		}
+		return s;
+	}
+};

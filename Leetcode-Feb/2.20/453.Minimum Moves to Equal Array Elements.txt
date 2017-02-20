@@ -1,0 +1,15 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+	/* n - 1个最小数+1，相当于1个最大数-1，问题转化为将n个数的和sum，与最小数*len之间的差 */
+public:
+	int minMoves(vector<int>& nums) {
+		if (nums.size() < 2) return 0;
+		int min = std::numeric_limits<int>::max();
+		int sum = 0;
+		for (int i = 0; i < nums.size(); ++i){
+			min = std::min(min, nums[i]);
+			sum += nums[i];
+		}
+		return sum - nums.size() * min;
+	}
+};

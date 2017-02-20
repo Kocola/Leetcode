@@ -1,0 +1,21 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	bool isPalindrome(string s) {
+		if (s.size() < 2) return true;
+		/* 预处理 */
+		int valid_index = 0;
+		for (int i = 0; i < s.size(); ++i){
+			if ((s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9')){
+				s[valid_index++] = s[i];
+			} else if (s[i] >= 'A' && s[i] <= 'Z'){
+				s[valid_index++] = s[i] + 'a' - 'A';
+			}
+		}
+		s.resize(valid_index);
+		for (int left = 0, right = s.size() - 1; left < right; ++left, --right){
+			if (s[left] != s[right]) return false;
+		}
+		return true;
+	}
+};

@@ -1,0 +1,117 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	string validIPAddress(string IP) {
+		if (IP.find('.') != std::string::npos) return isIpv4(IP) ? "IPv4" : "Neither";
+		else if (IP.find(':') != std::string::npos) return isIpv6(IP) ? "IPv6" : "Neither";
+		return "Neither";
+	}
+private:
+	bool isIpv4(const std::string& Ip){
+		if (Ip.size() < 7 || Ip.size() > 15) return false;
+		int dot_count = std::count_if(Ip.begin(), Ip.end(), [](char ch){ return ch == '.'; });
+		if (dot_count != 3) return false;
+		int seg_num = 0, leading_zero_count = 0, seg_len = 0;
+		for (int i = 0; i < Ip.size(); ++i){
+			if (!(seg_num >= 0 && seg_num <= 255)) return false;
+			if (Ip[i] == '.'){
+				if ((i > 0 && Ip[i - 1] == '.')) return false;
+				seg_num = 0;
+				seg_len = 0;
+				leading_zero_count = 0;
+			}
+			else if (Ip[i] >= '0' && Ip[i] <= '9'){
+				if (Ip[i] == '0'){
+					if (++leading_zero_count > 1) return false;
+				}
+				else{
+					if (leading_zero_count > 0) return false;
+				}
+				if (++seg_len > 3) return false;
+				seg_num = seg_num * 10 + (Ip[i] - '0');
+			}
+			else return false;
+		}
+		return (seg_num >= 0 && seg_num <= 255);
+	}
+
+	bool isIpv6(const std::string& Ip){
+		if (Ip.size() < 15 || Ip.size() > 39) return false;
+		int dot_count = std::count_if(Ip.begin(), Ip.end(), [](char ch){ return ch == ':'; });
+		if (dot_count > 7) return false;
+		int seg_len = 0;
+		for (int i = 0; i < Ip.size(); ++i){
+			if (Ip[i] == ':'){
+				if ((i > 0 && Ip[i - 1] == ':')) return false;
+				seg_len = 0;
+			}
+			else if (!((Ip[i] >= '0' && Ip[i] <= '9') || (Ip[i] >= 'a' && Ip[i] <= 'f')
+				|| (Ip[i] >= 'A' && Ip[i] <= 'F'))){
+				return false;
+			} else{
+				if (++seg_len > 4) return false;
+			}
+		}
+		return true;
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	string validIPAddress(string IP) {
+		if (IP.find('.') != std::string::npos) return isIpv4(IP) ? "IPv4" : "Neither";
+		else if (IP.find(':') != std::string::npos) return isIpv6(IP) ? "IPv6" : "Neither";
+		return "Neither";
+	}
+private:
+	bool isIpv4(const std::string& Ip){
+		if (Ip.size() < 7 || Ip.size() > 15) return false;
+		int dot_count = std::count_if(Ip.begin(), Ip.end(), [](char ch){ return ch == '.'; });
+		if (dot_count != 3) return false;
+		std::vector<std::string> strs = split(Ip, '.');
+		for (int i = 0; i < strs.size(); ++i){
+			if (strs[i].size() > 1 && strs[i].front() == '0') return false;
+			else if (strs[i].size() > 3 || strs[i].size() == 0) return false;
+			else {
+				int seg_num = 0;
+				for (int k = 0; k < strs[i].size(); ++k){
+					const char ch = strs[i][k];
+					if (!(ch >= '0' && ch <= '9')) return false;
+					seg_num = seg_num * 10 + (ch - '0');
+				}
+				if(seg_num > 255) return false;
+			}
+		}
+		return true;
+	}
+
+	bool isIpv6(const std::string& Ip){
+		if (Ip.size() < 15 || Ip.size() > 39) return false;
+		int dot_count = std::count_if(Ip.begin(), Ip.end(), [](char ch){ return ch == ':'; });
+		if (dot_count > 7) return false;
+		std::vector<std::string> strs = split(Ip, ':');
+		for (int i = 0; i < strs.size(); ++i){
+			if (strs[i].size() > 4 || strs[i].size() == 0) return false;
+			for (int k = 0; k < strs[i].size(); ++k){
+				const char ch = strs[i][k];
+				if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')))
+					return false;
+			}
+		}
+		return true;
+	}
+	std::vector<std::string> split(const std::string& str, char ch){
+		int index = 0;
+		std::vector<std::string> result;
+		while (1){
+			int next_index = str.find(ch, index);
+			if (next_index == std::string::npos){
+				result.push_back(str.substr(index));
+				break;
+			}
+			else result.push_back(str.substr(index, next_index - index));
+			index = next_index + 1;
+		}
+		return result;
+	}
+};

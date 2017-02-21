@@ -1,0 +1,15 @@
+1.Ê±¼ä£ºO£¨LOGN£©£»¿Õ¼ä£ºO£¨1£©
+bool isBadVersion(int version);
+
+class Solution {
+public:
+	int firstBadVersion(int n) {
+		int lower = 1, upper = n;
+		while (lower < upper){
+			int mid = lower + ((upper - lower) >> 1);
+			if (isBadVersion(mid)) upper = mid;
+			else lower = mid + 1;
+		}
+		return lower;
+	}
+};

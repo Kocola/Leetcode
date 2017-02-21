@@ -1,0 +1,32 @@
+1.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int countSegments(string s) {
+		if (s.empty()) return 0;
+		bool is_last_space = true;
+		int result = 0;
+		s.push_back(' ');
+		for (int i = 0; i < s.size(); ++i){
+			if (s[i] == ' '){
+				if (is_last_space == false) result++;
+				is_last_space = true;
+			} else{
+				is_last_space = false;
+			}
+		}
+		return result;
+	}
+};
+2.时间：O（N）；空间：O（1）
+class Solution {
+public:
+	int countSegments(string s) {
+		if (s.empty()) return 0;
+		int result = 0;
+		s.push_back(' ');
+		for (int i = 0; i < s.size() - 1; ++i){
+			if (s[i] != ' ' && s[i+1] == ' ') result++;
+		}
+		return result;
+	}
+};

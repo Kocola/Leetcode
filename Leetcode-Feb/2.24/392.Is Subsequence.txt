@@ -1,0 +1,18 @@
+1.Ê±¼ä£ºO£¨N£©£»¿Õ¼ä£ºO£¨1£©
+class Solution {
+public:
+	bool isSubsequence(string s, string t) {
+		if (s.size() > t.size()) return false;
+		int count = 0;
+		int sIndex = 0, tIndex = 0;
+		while (sIndex < s.size() && tIndex < t.size()){
+			if (s[sIndex] == t[tIndex]){
+				sIndex++;
+				count++;
+				if (count == s.size()) break;
+			}
+			tIndex++;
+		}
+		return count == s.size();
+	}
+};

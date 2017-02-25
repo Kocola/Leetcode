@@ -1,0 +1,31 @@
+1.时间：O（N）；空间：O（N）
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+		if (nums.empty()) return 0;
+		if (nums.size() == 1) return nums.front();
+		std::vector<int> dp(nums.size(), 0);
+		dp[0] = nums.front();
+		dp[1] = std::max(nums.front(), nums[1]);
+		for (int i = 2; i < nums.size(); ++i){
+			dp[i] = std::max(dp[i - 2] + nums[i], dp[i - 1]);
+		}
+		return dp.back();
+    }
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+		if (nums.empty()) return 0;
+		if (nums.size() == 1) return nums.front();
+		std::vector<int> vals(2, 0);
+		vals[1] = nums.front();
+		for (int i = 1; i < nums.size(); ++i){
+			int tmp = vals[0];
+			vals[0] = std::max(vals[0], vals[1]);
+			vals[1] = std::max(tmp + nums[i], vals[1]);
+		}
+		return std::max(vals[0], vals[1]);
+    }
+};

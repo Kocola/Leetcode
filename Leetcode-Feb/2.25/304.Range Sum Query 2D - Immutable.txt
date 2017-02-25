@@ -1,0 +1,31 @@
+1.Ê±¼ä£ºO£¨N^2£©;¿Õ¼ä£ºO£¨N^2£©
+class NumMatrix {
+public:
+	NumMatrix(vector<vector<int>> matrix) {
+		if (matrix.empty() || matrix.front().empty()) return;
+		const int rows = matrix.size(), cols = matrix.front().size();
+		std::vector<std::vector<int>>  dp(rows + 1, std::vector<int>(cols + 1, 0));
+		for (int i = 1; i <= rows; ++i){
+			for (int k = 1; k <= cols; ++k){
+				dp[i][k] = dp[i][k - 1] + dp[i - 1][k] + matrix[i-1][k-1] - dp[i-1][k-1];
+				//std::cout<<dp[i][k]<<" ";
+			}
+			//std::cout<<std::endl;
+		}
+		std::swap(sums, dp);
+	}
+
+	int sumRegion(int row1, int col1, int row2, int col2) {
+		if (row1 > row2 || col1 > col2) return 0;
+		//std::cout<<sums[row2+1][col2+1]<<" "<<sums[sums.size() - 1][col1]<<" "<<sums[row1].back()<<" "<<sums[row1][col1]<<std::endl;
+		return sums[row2+1][col2+1] - sums[row2+1][col1] - sums[row1][col2+1] + sums[row1][col1];
+	}
+private:
+	std::vector<std::vector<int>> sums;
+};
+
+/**
+ * Your NumMatrix object will be instantiated and called as such:
+ * NumMatrix obj = new NumMatrix(matrix);
+ * int param_1 = obj.sumRegion(row1,col1,row2,col2);
+ */

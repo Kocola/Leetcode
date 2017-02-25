@@ -1,0 +1,22 @@
+1.时间：O（N^2）；空间：O（N）
+class Solution {
+public:
+	vector<int> diffWaysToCompute(string input) {
+		std::vector<int> result;
+		for (int i = 0; i < input.size(); ++i){
+			if (input[i] != '+' && input[i] != '-' && input[i] != '*') continue;
+			std::vector<int> left = diffWaysToCompute(input.substr(0, i));
+			std::vector<int> right = diffWaysToCompute(input.substr(i + 1));
+			for (int j = 0; j < left.size(); ++j){
+				for (int k = 0; k < right.size(); ++k){
+					if (input[i] == '+') result.push_back(left[j] + right[k]);
+					else if (input[i] == '-') result.push_back(left[j] - right[k]);
+					else if (input[i] == '*') result.push_back(left[j] * right[k]);
+				}
+			}
+		}
+		/* 若无运算符，则表明仅有数字，直接插入到结果中 */
+		if (result.empty()) result.push_back(atoi(input.c_str()));
+		return result;
+	}
+};

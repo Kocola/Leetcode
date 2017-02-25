@@ -1,0 +1,33 @@
+1.时间：O（N^2）;空间：O（N^2）
+class Solution {
+public:
+	int maximalSquare(vector<vector<char>>& matrix) {
+		if (matrix.empty() || matrix.front().empty()) return 0;
+		const int rows = matrix.size();
+		const int cols = matrix.front().size();
+		std::vector<std::vector<int>> dp(rows, std::vector<int>(cols, 0));
+		/* 初始化dp */
+		int res = 0;
+		for (int i = 0; i < rows; ++i){
+			if (matrix[i][0] == '1'){
+				dp[i][0] = 1;
+				res = 1;
+			}
+		}
+		for (int i = 0; i < cols; ++i){
+			if (matrix[0][i] == '1'){
+				dp[0][i] = 1;
+				res = 1;
+			}
+		}
+		for (int i = 1; i < rows; ++i){
+			for (int k = 1; k < cols; ++k){
+				if (matrix[i][k] == '1'){
+					dp[i][k] = std::min(dp[i - 1][k - 1], std::min(dp[i - 1][k], dp[i][k - 1])) + 1;
+					res = std::max(res, dp[i][k] * dp[i][k]);
+				}
+			}
+		}
+		return res;
+	}
+};

@@ -1,0 +1,65 @@
+#include<iostream>
+#include<vector>
+#include<string.h>
+
+std::vector<int> calc_stucked_keys(std::string str, const int k){
+	if (str.empty()) return std::vector<int>(128, 1);
+	std::vector<int> hashTable(128, 1);  /* 默认所有字符是stucked */
+	str.push_back('\\');
+	char last_ch = str.front();;
+	int count = 1;
+	for (int i = 1; i < str.size(); ++i){
+		if (str[i] == last_ch) count++;
+		else{
+			if (hashTable[last_ch] == 1 && count % k != 0)
+				hashTable[last_ch] = 0;
+			count = 1;
+			last_ch = str[i];
+		}
+	}
+	return hashTable;
+}
+
+void restore(std::vector<int>& hashTable, const std::string& str, const int k){
+	if (str.empty()) return;
+	std::string stucked_keys, restore_str;
+	char last_stucked_key = '\0';
+	int stucked_keys_count = 0;
+	for (int i = 0; i < str.size(); ++i){
+		if (hashTable[str[i]] == 0){
+			restore_str.push_back(str[i]);
+		}
+		else{
+			if (hashTable[str[i]] == 1) 
+				stucked_keys.push_back(str[i]);
+			if (str[i] == last_stucked_key){
+				if (stucked_keys_count % k == 0) restore_str.push_back(str[i]);
+				++stucked_keys_count;
+			}
+			else{
+				last_stucked_key = str[i];
+				restore_str.push_back(str[i]);
+				stucked_keys_count = 1;
+				hashTable[str[i]] = 2;
+			}
+		}
+	}
+	/* 打印 */
+	//if (!stucked_keys.empty()) std::cout << stucked_keys.front();
+	//for (int i = 1; i < stucked_keys.size(); ++i) std::cout << " " << stucked_keys[i];
+	std::cout << stucked_keys << std::endl;
+	std::cout << restore_str << std::endl;
+}
+
+
+int main(){
+
+	std::string str;
+	int k;
+	std::cin >> k >> str;
+	std::vector<int> hashTable = calc_stucked_keys(str, k);
+	restore(hashTable, str, k);
+
+	//system("pause");
+	return 0;
+}

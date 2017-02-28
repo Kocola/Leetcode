@@ -1,0 +1,68 @@
+1.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	int wiggleMaxLength(vector<int>& nums) {
+		if (nums.size() < 2) return nums.size();
+		std::vector<int> dp(nums.size(), 0);
+		std::vector<int> diff(nums.size(), 0);
+		for (int i = 1; i < nums.size(); ++i){
+			if (nums[i] == nums[i - 1]) {
+				diff[i] = diff[i - 1];	/* 1, 0, 1 这个应该返回 1，而不是 2，因为0去掉后变成1,1 */
+			} else 
+				diff[i] = nums[i] - nums[i - 1] > 0 ? 1 : -1;
+		}
+		dp[0] = 1;
+		for (int i = 1; i < nums.size(); ++i){
+			if (diff[i] == 0 || diff[i] == diff[i-1]) dp[i] = dp[i - 1];
+			else dp[i] = dp[i - 1] + 1;
+		}
+		return dp.back();
+	}
+};
+2.时间：O（N）；空间：O（1）	-->isInit的判断和赋值操作导致运行时间相比1大幅增加
+class Solution {
+public:
+	int wiggleMaxLength(vector<int>& nums) {
+		if (nums.size() < 2) return nums.size();
+		int count = 1;
+		/* isInit用于解决isInc在开始不确定的情形，例如3,3,3,1,2，这里在0~2的下标区间中isInc是无法确定的，count计数也无法确定 */
+		bool isInc = false, isInit = false;;
+		for (int i = 1; i < nums.size(); ++i){
+			if (nums[i] > nums[i - 1] && (!isInit || !isInc)){
+				count++;
+				isInc = true;
+				isInit = true;
+			} else if (nums[i] < nums[i - 1] && (!isInit || isInc)){
+				count++;
+				isInc = false;
+				isInit = true;
+			}
+		}
+		return count;
+	}
+};
+3.时间：O（N）；空间：（1）	-->相比2，优化掉isInit，运行时间和1相同，但没有额外空间消耗
+class Solution {
+public:
+	int wiggleMaxLength(vector<int>& nums) {
+		if (nums.size() < 2) return nums.size();
+		int startIndex = 1;
+		while (nums[startIndex] == nums[startIndex - 1]){
+			startIndex++;
+		}
+		int count = 1;
+		bool isInc = nums[startIndex] > nums[startIndex - 1] ? true : false;
+		isInc = !isInc;
+
+		for (int i = startIndex; i < nums.size(); ++i){
+			if (nums[i] > nums[i - 1] && !isInc){
+				count++;
+				isInc = true;
+			} else if (nums[i] < nums[i - 1] && isInc){
+				count++;
+				isInc = false;
+			}
+		}
+		return count;
+	}
+};

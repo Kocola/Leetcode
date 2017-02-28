@@ -1,0 +1,21 @@
+1.Ê±¼ä£ºO£¨N^2£©;¿Õ¼ä£ºO£¨N^2£©
+class Solution {
+public:
+	int getMoneyAmount(int n) {
+		if (n < 1) return 0;
+		std::vector<std::vector<int>> dp(n + 1, std::vector<int>(n + 1, 0));
+		return dfs(dp, 1, n);
+	}
+private:
+	int dfs(std::vector<std::vector<int>>& dp, int start, int end){
+		if (start >= end) return 0;
+		if (dp[start][end] != 0) return dp[start][end];
+		int min_cost = std::numeric_limits<int>::max();
+		for (int i = start; i <= end; ++i){
+			int tmp = i + std::max(dfs(dp, start, i - 1), dfs(dp, i + 1, end));
+			min_cost = std::min(min_cost, tmp);
+		}
+		dp[start][end] = min_cost;
+		return dp[start][end];
+	}
+};

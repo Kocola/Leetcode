@@ -1,0 +1,25 @@
+1.Ê±¼ä£ºO£¨£©£»¿Õ¼ä£ºO£¨£©
+class Solution {
+public:
+	bool canIWin(int maxChoosableInteger, int desiredTotal) {
+		if (maxChoosableInteger > desiredTotal) return true;
+		if ((1 + maxChoosableInteger) * maxChoosableInteger / 2 < desiredTotal) return false;
+		return dfs(maxChoosableInteger, desiredTotal, 0);
+	}
+private:
+	bool dfs(const int maxmaxChoosableInteger, int target, int visited){
+		if (hashTable.find(visited) != hashTable.end()) return hashTable[visited];
+		for (int i = 0; i < maxmaxChoosableInteger; ++i){
+			int mask = 1 << i;
+			if ((mask & visited) == 0 && 
+				(target <= (i + 1) || !dfs(maxmaxChoosableInteger, target - (i + 1), mask | visited))){
+				hashTable[visited] = true;
+				return true;
+			}
+		}
+		hashTable[visited] = false;
+		return false;
+	}
+private:
+	std::unordered_map<int, bool> hashTable;
+};

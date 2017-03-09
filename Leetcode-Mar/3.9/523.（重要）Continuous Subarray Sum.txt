@@ -1,0 +1,53 @@
+1.时间：O（N^2）;空间：O（N）
+class Solution {
+public:
+	bool checkSubarraySum(vector<int>& nums, int k) {
+		if (nums.size() < 2) return false;
+		const int len = nums.size();
+		if (k == 0){	/* 优化k==0的情况 */
+			return hasContinuousZero(nums);
+		}
+		std::vector<int> dp(nums.size() + 1, 0);
+		for (int i = 1; i < dp.size(); ++i)
+			dp[i] = dp[i - 1] + nums[i - 1];
+		for (int i = 0; i < len; ++i){
+			for (int j = i + 2; j <= len; ++j){
+				int subsum = dp[j] - dp[i];
+				if (subsum % k == 0) return true;
+			}
+		}
+		return false;
+	}
+private:
+	bool hasContinuousZero(const std::vector<int>& nums){
+		for (int i = 1; i < nums.size(); ++i)
+			if (nums[i] == 0 && nums[i - 1] == 0) return true;
+		return false;
+	}
+};
+2.时间：O（N）；空间：O（N）
+class Solution {
+public:
+	bool checkSubarraySum(vector<int>& nums, int k) {
+		if (nums.size() < 2) return false;
+		const int len = nums.size();
+		if (k == 0) return hasContinuousZero(nums);
+		std::unordered_map<int, int> hashTable;
+		hashTable[0] = -1;
+		int sum = 0;
+		for (int i = 0; i < len; ++i){
+			sum = (sum + nums[i]) % k;
+			if (hashTable.count(sum)){
+				if (i - hashTable[sum] > 1) return true;
+			}
+			else hashTable[sum] = i;
+		}
+		return false;
+	}
+private:
+	bool hasContinuousZero(const std::vector<int>& nums){
+		for (int i = 1; i < nums.size(); ++i)
+			if (nums[i] == 0 && nums[i - 1] == 0) return true;
+		return false;
+	}
+};
